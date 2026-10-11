@@ -1,0 +1,30 @@
+{
+  "name": "Harbor Coupe",
+  "authoring": "Blender 4.5.3 LTS",
+  "frontAxis": "+Z",
+  "wheelRadius": 0.35,
+  "wheels": {
+    "WheelFrontL": [
+      0.84,
+      0.35,
+      1.35
+    ],
+    "WheelFrontR": [
+      -0.84,
+      0.35,
+      1.35
+    ],
+    "WheelRearL": [
+      0.84,
+      0.35,
+      -1.35
+    ],
+    "WheelRearR": [
+      -0.84,
+      0.35,
+      -1.35
+    ]
+  },
+  "parts": 32,
+  "triangles": 111824
+}

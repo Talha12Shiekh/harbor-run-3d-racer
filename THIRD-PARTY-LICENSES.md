@@ -2,7 +2,7 @@
 
 ## Concept Car
 
-File: dist/assets/car.glb.
+File: dist/assets/car.glb, retained baseline, not loaded by the current game.
 
 Source: https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept
 
@@ -41,3 +41,9 @@ Source: https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky
 License: CC0, https://polyhaven.com/license . The 2K HDR image supplies the sky and material reflections. Original asphalt and brick maps are also embedded in the Blender GLB exports. road-worn.jpg is a modified version of Asphalt 01 with generated cracks and pockmarks.
 
 Blender is an authoring tool and is not distributed in this source package. Editable scene and generated models are included.
+
+## Harbor Coupe
+
+Files: dist/assets/tuner-coupe.glb, tuner-coupe.json and assets-src/tuner-coupe.blend.
+
+The coupe geometry, original vinyl and carbon weave texture were authored for Harbor Run using the included Blender and Pillow scripts. Reference photographs informed proportions and detail; their pixels, branding and vinyl artwork are not bundled. The coupe does not use geometry from the retained Concept Car.

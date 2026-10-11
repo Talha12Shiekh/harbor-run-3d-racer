@@ -15,3 +15,6 @@ The authoritative interface tokens are in dist/style.css. The type uses the brow
 
 ## Responsive behavior
 Menus adapt to narrow screens. The actual game requires a keyboard or standard gamepad. HUD contracts below 800px. Reduced motion disables the menu orbit. Focus states remain visible on every control.
+
+## Vehicle direction
+The Harbor Coupe uses street car proportions and defined bumper, light and wheel detail. A rear wing, diffuser and original red and black vinyl establish the tuned racing appearance. Glazing reveals a dark interior. Rubber, alloy, carbon, paint and lamps use separate surfaces. The daytime sky supplies paint and glass reflections. Wheel spin uses centered separate axle groups; calipers are fixed to the body.

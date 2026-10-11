@@ -60,3 +60,29 @@ Reuse the existing detailed car and gameplay. Keep assets local, reusable and li
 
 ### Rationale
 See rationale.md for screenshot evidence and alternatives.
+
+
+## Vehicle upgrade, authorized by screenshot feedback 2026-10-11
+
+### Summary
+Replace the bulbous concept car with an original tuned street coupe authored in Blender. The supplied pictures define the direction: road car proportions, sculpted bumpers, visible lamps, detailed wheels, a rear wing and vinyl graphics. The renderer and race remain.
+
+### Requirements
+AC-10: A smooth Blender body with open wheel arches, glazing, interior, headlights, red rear lamps, five spoke wheels, bumper vents, seams, skirts, rear diffuser and wing replaces the concept car.
+AC-11: Existing paint choices remain. Original black and red vinyl, controlled paint reflections, translucent glass and separate rubber, metal and carbon materials distinguish surfaces. Wing and rear lamps are readable from the chase camera.
+AC-12: Four grounded wheel groups spin and steer correctly. Front points toward positive Z. Braking changes rear lamp intensity. Race state, collision dimensions, circuit and controls remain unchanged.
+AC-13: Deliver editable Blender scene, script, GLB metadata, asset renders and updated source through the same Site and source file identity. Record geometry and image checks separately from GPU playtesting.
+
+### Decision and value sources
+Create assets-src/build_car.py and export dist/assets/tuner-coupe.glb. Longitudinal body sections, wheel arch curves and separate cabin panels produce the geometry. Target dimensions are approximately 4.6 metres long and 1.9 metres wide, with a 1.35 metre cabin and 0.34 metre tire radius. The first attachment shows the existing game; the remaining pictures inform lamps, body kit, spokes, wing and vinyl composition. Original vinyl comes from a deterministic Pillow script with no copied logos or artwork.
+
+Material names define paint, glass, carbon, rubber, rims and lamps. Wheel groups retain WheelFrontL, WheelFrontR, WheelRearL and WheelRearR. The loader preserves authored surface settings. Paint comes from profile and car colors; brake state and wheel angle come from sim.js. Ground height comes from tire vertices. The local daylight environment supplies reflections.
+
+### Build plan
+- [x] AC-10, AC-12: Export the body and wheels and establish loading through the existing preparation contract.
+- [x] AC-10, AC-11: Complete lamps, cabin, wheels, seams, body kit and vinyl; inspect front and rear Blender renders.
+- [x] AC-12, AC-13: Verify dimensions, contact, pivots, direction, paint and brake isolation, normals, UVs, images and driving regressions.
+AC-13 delivery: push checked source, publish the existing private Site and replace the existing source ZIP. Actual game appearance and frame rate remain manual checks until supported browser tooling is available.
+
+### Consequences
+One new car model is shared by racers and traffic with paint variations. It does not reproduce a branded vehicle exactly. Material tuning alone retains concept proportions, so geometry replacement is selected. Profiles and races require no data migration. Reverting the vehicle asset path restores the earlier model.

@@ -11,3 +11,8 @@ The user explicitly authorized installing Blender and creating scenery assets. T
 
 ## Project sources
 The three attached screenshots were inspected directly. Existing world.js, design.md and the first circuit spec provide current geometry, route and renderer constraints. Browser QA is unavailable under the managed Sites workflow. Blender asset renders will be reported separately from game rendering.
+
+## Vehicle screenshot diagnosis
+The four new attachments were inspected directly. The game car has a rounded rear, a dominant dark rear window, thin lights and little bumper contrast. References show defined lamps, panel seams, road car proportions, detailed rims, a rear wing, bumper openings and contrasting vinyl.
+
+The current Concept Car is 2.684 metres wide after normalization to 4.6 metres long. Generic shader overrides force its paint and glazing to similar surfaces. A shader only pass retains that silhouette. Reshaping it risks distorting wheels and panels. A separate Blender coupe supplies the selected proportions and preserves the wheel contract without changing the simulation.

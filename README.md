@@ -11,7 +11,7 @@ cd dist
 python3 -m http.server 8080
 ```
 
-Open http://localhost:8080 in a desktop browser with WebGL and hardware acceleration. Opening index.html directly with a file URL does not support the module and asset loading workflow. The first load is approximately 35 MB. There are no runtime CDN requests.
+Open http://localhost:8080 in a desktop browser with WebGL and hardware acceleration. Opening index.html directly with a file URL does not support the module and asset loading workflow. The first load is approximately 27 MB. There are no runtime CDN requests.
 
 Use the game menu to start, choose paint, change graphics or sound, and view credits. Reduced graphics lowers resolution and disables shadows. No online account or backend is used. Best race, best lap, paint, graphics and sound volume are saved in browser localStorage when it is available.
 
@@ -67,7 +67,7 @@ The model geometry check stubs image bitmap metadata for Node. It does not test 
 
 ## Scope and limitations
 
-This updated release contains one original circuit and one detailed car model reused with different paint for racers and traffic. It is not a full commercial game recreation. Police pursuits, career, additional vehicle models, upgrades and touch driving remain later work. GPU visual quality, actual gamepad hardware and frame rate have not been verified in a real browser in this environment. Geometry and simulation checks passed.
+This updated release contains one original circuit and one Blender authored street coupe reused with different paint for racers and traffic. It is not a full commercial game recreation. Police pursuits, career, additional vehicle models, upgrades and touch driving remain later work. GPU visual quality, actual gamepad hardware and frame rate have not been verified in a real browser in this environment. Geometry and simulation checks passed.
 
 All editable code and required assets are included. See THIRD-PARTY-LICENSES.md and upstream license files before redistribution. The hosting configuration identifies the existing private Site; change or remove it before publishing under a different project.
 
@@ -83,3 +83,14 @@ blender --background --factory-startup --python assets-src/build_city.py
 ```
 
 Add `-- --render` to the Blender command to render the verification street. `assets-src/scene-preview.png` is a Blender render of the asset kit, not a screenshot from the running game. The authoring scripts generate textured masonry, limestone, offices, towers, warehouses, two trees, a pipe bridge, a bus shelter and a hydrant. Asset instances share geometry and materials. The route, race rules and input mappings are unchanged.
+
+## Vehicle authoring
+
+The live game loads `dist/assets/tuner-coupe.glb`. Its editable Blender source is `assets-src/tuner-coupe.blend`. The model has curved body panels and wheel arches, separate glass and interior, five spoke wheels with tire detail, projector lamps, red rear lamps, grille fins, side skirts, a rear diffuser, twin exhausts and a rear wing. Original red and black vinyl remains distinct from selectable paint. Calipers stay fixed while wheels rotate.
+
+```sh
+python3 assets-src/make_car_vinyl.py
+blender --background --factory-startup --python assets-src/build_car.py
+```
+
+Add `-- --render` for the front and rear asset renders. These use Blender Cycles, not the game renderer. Vehicle measurements and wheel naming are included in `dist/assets/tuner-coupe.json`. All racers and traffic share this model; there is no vehicle selection catalog. The earlier Concept Car GLB is retained as a credited baseline asset, but the game no longer loads it.
