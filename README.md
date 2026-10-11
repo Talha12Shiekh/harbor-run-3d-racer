@@ -63,7 +63,7 @@ npm run check:model
 npm run check:city
 ```
 
-The model geometry check stubs image bitmap metadata for Node. It does not test GPU texture upload. See BUILD-REPORT.md for exact verification and remaining limits.
+The model check includes eight scene integration tests for wheel steering and spin, paint, brake lamps, boost, cameras, skid transforms, restarts and a complete race. It stubs image bitmap metadata and the GPU render call for Node. It does not test GPU texture upload or browser visuals. See BUILD-REPORT.md for exact verification and remaining limits.
 
 ## Scope and limitations
 

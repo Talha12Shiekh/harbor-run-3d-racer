@@ -1,6 +1,6 @@
 # Harbor Run build report
 
-Date: 2026-10-11, vehicle upgrade 1.2.0.
+Date: 2026-10-11, vehicle upgrade 1.2.1.
 
 The user played the first published circuit and reported that it was playable, but the environment looked too simple. The supplied comparisons guided this upgrade. This report distinguishes the new asset and simulation checks from live GPU validation.
 
@@ -33,3 +33,11 @@ Police pursuits, career, upgrades, more cars and touch driving remain outside th
 Blender 4.5.3 LTS exported the new coupe and saved the editable scene. Two 1200 by 800 Cycles renders were inspected. The first pass exposed opaque glass and lenses; the Blender Alpha input and exported blend mode were corrected. Rear wing supports were grounded on the trunk and the interior was finished with dark trim and seats. Both embedded images (64 by 64 carbon weave and 2048 by 512 RGBA vinyl) decode with Pillow. Glass, lamp lenses and vinyl have exported BLEND alpha modes. The source textures and render images also decode.
 
 These renders verify the authored asset, not its appearance in the running game. Updated browser rendering, transparency sorting, subjective reference similarity and FPS remain manual checks. Inspect rear lamp visibility, paint choices, vinyl, cabin, wheel rotation and front steering after reloading the published game. Existing 12 simulation tests and city checks passed again. One vehicle model is used for all cars; distinct traffic bodies and selectable cars are later work.
+
+## Vehicle runtime verification
+
+Eight additional checks call the real World scene methods with the authored GLB and real Race simulation. Only the GPU render call is replaced. The checks cover steering across wheel spin phases, paint isolation, brake lamp activation and release, positions and contact shadows, boost visibility, repeated race restarts, chase and rear cameras, reduced motion garage camera, skid transforms and a complete legal race.
+
+Two checks initially failed. The default XYZ rotation order tilted a steered front wheel axle as the wheel spun. The wheel now uses YXZ so steering turns the axle while spin leaves it level. Restarting previously removed scene objects without disposing the resources unique to each car. It now releases cloned paint and brake materials, flame geometry and material, and contact shadow geometry and material. Each restart releases 48 old resources exactly once and preserves shared car geometry, materials and textures. Four repeated restarts retain eight cars and eight shadows with no old scene objects.
+
+All eight runtime checks pass after these corrections. The existing twelve driving tests, static source check, model geometry checks and city asset checks also pass. Browser appearance, GPU memory measurements and FPS remain unverified. The restart checks validate disposal events and ownership, not a GPU memory profile.

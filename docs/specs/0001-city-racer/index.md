@@ -73,6 +73,8 @@ AC-11: Existing paint choices remain. Original black and red vinyl, controlled p
 AC-12: Four grounded wheel groups spin and steer correctly. Front points toward positive Z. Braking changes rear lamp intensity. Race state, collision dimensions, circuit and controls remain unchanged.
 AC-13: Deliver editable Blender scene, script, GLB metadata, asset renders and updated source through the same Site and source file identity. Record geometry and image checks separately from GPU playtesting.
 
+Runtime follow through in 1.2.1: eight automated scene integration checks cover AC-11 and AC-12, camera behavior from AC-4, and a complete race from AC-3. They reproduced and protected fixes for wheel rotation order and cleanup of unique car resources on restart. Shared assets remain reusable. GPU appearance and performance criteria remain open for manual verification.
+
 ### Decision and value sources
 Create assets-src/build_car.py and export dist/assets/tuner-coupe.glb. Longitudinal body sections, wheel arch curves and separate cabin panels produce the geometry. Target dimensions are approximately 4.6 metres long and 1.9 metres wide, with a 1.35 metre cabin and 0.34 metre tire radius. The first attachment shows the existing game; the remaining pictures inform lamps, body kit, spokes, wing and vinyl composition. Original vinyl comes from a deterministic Pillow script with no copied logos or artwork.
 
