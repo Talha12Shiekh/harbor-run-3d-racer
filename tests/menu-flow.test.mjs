@@ -6,6 +6,8 @@ import vm from 'node:vm';
 import * as sim from '../dist/sim.js';
 import * as catalog from '../dist/catalog.js';
 import * as handling from '../dist/handling.js';
+import * as cameras from '../dist/cameras.js';
+import * as navigation from '../dist/navigation.js';
 const html=await readFile(new URL('../dist/index.html',import.meta.url),'utf8');
 const code=(await readFile(new URL('../dist/app.js',import.meta.url),'utf8')).replace(/^import .*;\n/gm,'');
 class Element{
@@ -13,20 +15,21 @@ class Element{
  append(...children){this.children.push(...children);}
  replaceChildren(...children){this.children=children;}
  setAttribute(k,v){this.attributes[k]=String(v);}
- getAttribute(k){return this.attributes[k];}
+ getAttribute(k){return this.attributes[k]??null;}
  addEventListener(){}
- focus(){this.focused=true;}
+ focus(){this.focused=true;this.onFocus?.(this);}
  showModal(){this.open=true;}
  close(){this.open=false;}
  getContext(){return new Proxy({},{get(){return ()=>{};},set(){return true;}});}
 }
 async function app(saved=null){
  const ids=new Map([...html.matchAll(/<([\w-]+)[^>]*id="([^"]+)"[^>]*>/g)].map(m=>{const e=new Element(m[1]);e.hidden=/\bhidden\b/.test(m[0]);return [m[2],e];}));
- for(const view of ['front','rear','left','right','angle','orbit']){const b=new Element('button');b.dataset.view=view;ids.get('cameraChoices').append(b);}
+ for(const view of ['front','rear','left','right','angle','orbit']){const b=new Element('button');b.dataset.view=view;b.setAttribute('aria-pressed',view==='orbit');ids.get('cameraChoices').append(b);}
  let data=saved?JSON.stringify(saved):null;const listeners={},pad={index:0,mapping:'standard',axes:[0],buttons:Array.from({length:16},()=>({value:0}))};
- class World{constructor(){this.followInitialized=false;this.calls=[];}setQuality(){}async load(progress){progress(1);}setVehicle(id){this.calls.push(['car',id]);}setEnvironment(id){this.calls.push(['scene',id]);}setGarageView(id){this.calls.push(['camera',id]);}setPaint(){}attachCars(){this.calls.push(['attach']);}update(){}resize(){}}
+ class World{constructor(){this.followInitialized=false;this.calls=[];}setQuality(){}setDrivingView(id){this.drivingView=id;this.calls.push(['drivingCamera',id]);}rotateCamera(delta){this.trackingYaw=cameras.wrapYaw((this.trackingYaw??-.72)+delta);}async load(progress){progress(1);}setVehicle(id){this.calls.push(['car',id]);}setEnvironment(id){this.calls.push(['scene',id]);}setGarageView(id){this.calls.push(['camera',id]);}setPaint(){}attachCars(){this.calls.push(['attach']);}update(){}resize(){}}
  class Sound{resume(){return Promise.resolve();}update(){}}
- const context=vm.createContext({...sim,...catalog,...handling,World,Sound,console,performance:{now:()=>0},matchMedia:()=>({matches:false}),navigator:{getGamepads:()=>[pad]},localStorage:{getItem:()=>data,setItem(k,v){data=v;}},window:{},document:{getElementById:id=>ids.get(id),createElement:tag=>new Element(tag),createElementNS:(ns,tag)=>new Element(tag),addEventListener:(name,handler)=>listeners[name]=handler,documentElement:{requestFullscreen:async()=>{}}},addEventListener:(name,handler)=>listeners[name]=handler,requestAnimationFrame(){},location:{reload(){}},innerWidth:1366,innerHeight:768});
+ const doc={activeElement:null};const create=tag=>{const e=new Element(tag);e.onFocus=element=>doc.activeElement=element;return e;};for(const e of ids.values())e.onFocus=element=>doc.activeElement=element;for(const e of ids.get('cameraChoices').children)e.onFocus=element=>doc.activeElement=element;
+ const context=vm.createContext({...sim,...catalog,...handling,...cameras,...navigation,World,Sound,console,performance:{now:()=>0},matchMedia:()=>({matches:false}),navigator:{getGamepads:()=>[pad]},localStorage:{getItem:()=>data,setItem(k,v){data=v;}},window:{},document:Object.assign(doc,{getElementById:id=>ids.get(id),createElement:create,createElementNS:(ns,tag)=>create(tag),addEventListener:(name,handler)=>listeners[name]=handler,documentElement:{requestFullscreen:async()=>{}}}),addEventListener:(name,handler)=>listeners[name]=handler,requestAnimationFrame(){},location:{reload(){}},innerWidth:1366,innerHeight:768});
  vm.runInContext(code,context);await new Promise(resolve=>setImmediate(resolve));
  return {ids,context,game:context.window.harborRun,pad,listeners,saved:()=>JSON.parse(data)};
 }
@@ -72,4 +75,45 @@ test('AC-27 actual pursuit HUD and escape/bust result handlers use separate real
  a.game.race.phase='finished';a.game.race.outcome='escaped';vm.runInContext('finish()',a.context);assert.equal(a.ids.get('resultEyebrow').textContent,'PURSUIT ESCAPED');assert.equal(a.ids.get('standings').hidden,true);assert.equal(a.ids.get('resultLap').textContent,'2 / 3');assert.equal(a.saved().records.escape,36);assert.equal(a.saved().records.lap,90);assert.equal(a.saved().records.race,180);
  a.ids.get('raceAgain').onclick();assert.equal(a.game.race.pursuit.heat,1);a.game.race.phase='finished';a.game.race.outcome='busted';a.game.race.elapsed=12;vm.runInContext('finish()',a.context);assert.equal(a.ids.get('resultEyebrow').textContent,'BUSTED');assert.equal(a.saved().records.escape,36);
  a.ids.get('showPerformance').checked=true;a.ids.get('showPerformance').onchange();assert.equal(a.saved().showPerformance,true);a.ids.get('quality').value='auto';a.ids.get('quality').onchange();assert.equal(a.saved().quality,'auto');
+});
+
+test('AC-34 arrows change every garage choice through real handlers without starting the event',async()=>{
+ const a=await app({onboardingVersion:1});a.ids.get('enterGarage').onclick();
+ const key=code=>a.listeners.keydown({code,repeat:false,target:{tagName:'BUTTON'},preventDefault(){}});
+ key('ArrowUp');key('ArrowLeft');assert.equal(a.game.world.calls.at(-1)[1],'angle');
+ key('ArrowUp');key('ArrowRight');assert.equal(a.saved().paint,sim.PAINTS[1]);
+ key('ArrowUp');key('ArrowRight');assert.equal(a.saved().environment,'alpine');
+ key('ArrowUp');key('ArrowRight');assert.equal(a.saved().vehicle,'spyder');
+ key('ArrowUp');key('ArrowRight');assert.equal(a.saved().mode,'pursuit');
+ key('Enter');assert.equal(a.game.race.phase,'menu');
+ assert.equal(vm.runInContext('readInput()',a.context).steer,0);
+ a.ids.get('start').focus();key('Enter');assert.equal(a.game.race.phase,'countdown');
+ assert.equal(vm.runInContext('readInput()',a.context).throttle,0);
+});
+test('AC-34 gamepad menu direction is an edge and held menu controls must release before driving',async()=>{
+ const a=await app({onboardingVersion:1});a.ids.get('enterGarage').onclick();
+ const input=()=>vm.runInContext('readInput()',a.context);
+ a.ids.get('vehicleChoices').children[0].focus();a.pad.axes[0]=1;input();assert.equal(a.saved().vehicle,'spyder');input();input();assert.equal(a.saved().vehicle,'spyder');
+ a.pad.axes[0]=0;input();a.pad.axes[0]=1;input();assert.equal(a.saved().vehicle,'interceptor');
+ a.ids.get('start').focus();a.pad.buttons[0].value=1;input();assert.equal(a.game.race.phase,'countdown');a.game.race.phase='racing';assert.equal(input().steer,0);assert.equal(input().handbrake,false);
+ a.pad.buttons[0].value=0;a.pad.axes[0]=0;input();a.pad.axes[0]=-1;assert.equal(input().steer,1);
+});
+test('AC-30 V, LB and HUD cycle views while rear hold and angle adjustment preserve event state',async()=>{
+ const a=await app({onboardingVersion:1});a.ids.get('enterGarage').onclick();a.ids.get('start').onclick();a.game.race.phase='racing';
+ const press=(code,repeat=false)=>a.listeners.keydown({code,repeat,target:{tagName:'CANVAS'},preventDefault(){}}),input=()=>vm.runInContext('readInput()',a.context);
+ input();const before=JSON.stringify(a.game.race);
+ for(const view of ['wide','tracking','hood','cockpit','chase']){press('KeyV');assert.equal(a.saved().camera,view);assert.equal(a.game.world.drivingView,view);assert.ok(a.ids.get('cameraButton').textContent.includes(cameras.drivingView(view).label));}
+ assert.equal(JSON.stringify(a.game.race),before);press('KeyV',true);assert.equal(a.saved().camera,'chase');
+ a.pad.buttons[4].value=1;input();assert.equal(a.saved().camera,'wide');input();assert.equal(a.saved().camera,'wide');a.pad.buttons[4].value=0;input();
+ a.ids.get('cameraButton').onclick();assert.equal(a.saved().camera,'tracking');assert.equal(a.ids.get('angleControls').hidden,false);
+ const yaw=a.saved().trackingYaw;a.ids.get('cameraRight').onclick();assert.ok(Math.abs(a.saved().trackingYaw-yaw-.18)<1e-10);
+ press('KeyC');assert.equal(input().rear,true);assert.equal(a.saved().camera,'tracking');a.listeners.keyup({code:'KeyC'});assert.equal(input().rear,false);
+ press('BracketLeft');assert.equal(input().orbit,-1);a.listeners.keyup({code:'BracketLeft'});assert.equal(input().orbit,0);
+});
+test('AC-35 saved camera is restored and native dialog controls cannot drive or navigate behind it',async()=>{
+ const a=await app({onboardingVersion:1,camera:'cockpit',trackingYaw:18,records:{lap:91,race:190,escape:46}});assert.equal(a.game.world.drivingView,'cockpit');assert.ok(Math.abs(a.game.world.trackingYaw)<=Math.PI);a.ids.get('enterGarage').onclick();
+ a.ids.get('settingsButton').onclick();const mode=a.game.race.mode;
+ a.listeners.keydown({code:'ArrowRight',repeat:false,target:{tagName:'SELECT'},preventDefault(){throw Error('Native field was intercepted');}});
+ assert.equal(a.game.race.phase,'menu');assert.equal(a.game.race.mode,mode);a.ids.get('drivingCamera').value='hood';a.ids.get('drivingCamera').onchange();assert.equal(a.saved().camera,'hood');a.ids.get('closeDetails').onclick();a.ids.get('start').onclick();assert.equal(a.game.world.drivingView,'hood');assert.equal(a.saved().records.escape,46);
+ const bad=sim.validateProfile({camera:'bad',trackingYaw:Infinity,records:{race:190}});assert.equal(bad.camera,'chase');assert.equal(bad.trackingYaw,-.72);assert.equal(bad.records.race,190);
 });

@@ -1,12 +1,26 @@
-# Harbor Run 1.6.0 verification report
+# Harbor Run 1.7.0 verification report
 
 Date: 2026-10-11.
 
-## Result
+## Driving cameras and onboarding
+
+Five persistent driving presets now work in Circuit and Pursuit: Chase, Wide chase, front three quarter Tracking, Hood and Cockpit. V/LB or the HUD button cycles them. Brackets or angle buttons rotate Tracking. C/RB temporarily looks behind without changing the selected view. View changes do not reset or modify the simulation. Interior changes snap rather than interpolating through the body. Reduced motion suppresses corner look.
+
+The new original Blender cabin has 24,892 triangles: stitched leather, brushed alloy, vents, console, instrument shroud, wheel controls and emissive dials. Real steering animates the wheel; real speed and a speed/gear estimate animate the needles. Per-body driver eyes and lifts keep the controls visible. Close windshield trim follows the eye; the spyder omits its header. No additional render or mirror pass is introduced.
+
+A forward ray check initially failed because the merged hypercar roof covered the driver view. At load time, original painted roof triangles are separated into a visibility group. Cockpit hides that group, the original cabin and opaque-looking exterior glazing. Every outside view restores them. The five accepted exterior GLBs and their exterior triangle totals, bounds and silhouette are unchanged. The split adds one exterior mesh for each closed body; shared cabin geometry/materials survive restarts.
+
+Title and briefing use a brighter original blue car image with a restrained left scrim and local Barlow display fonts. The exact builtin Imagegen prompt and original-car reference are documented in `assets-src/title-art-prompt.txt`; `dist/assets/ui/title-v2.jpg` is marketing artwork. Existing car and setting thumbnails remain Blender renders. The screenshot's 330 px stretched car images now have explicit 44 px heights, 62 px cards and no bottom padding that would crop their labels. Desktop layout has a compact three-row garage at 1100 × 600 and larger; smaller displays keep scrolling. The briefing presents six driving/menu control cards together.
+
+Arrows navigate real choice groups; Left/Right selects through the same handler as clicking. Enter confirms the focused action. Gamepad D pad/stick navigate on direction edges and A confirms. Held menu controls must return to neutral before driving. Native dialog controls retain their arrow behavior, and closing a dialog restores focus to its trigger. Camera ID/yaw validation preserves the existing profile key and records.
+
+## Retained gameplay and performance work
+
+The following steering, handling, pursuit and scenery optimization findings were established for 1.6.0 and retained. Their Node measurements are historical evidence, not newly measured browser FPS.
 
 Driver steering was reversed relative to the real chase camera. Vehicles face positive Z, so the camera behind them has screen right toward negative X. Left/A and the left stick now increase world heading; right/D and the right stick decrease it. A regression first failed against the old actual app handler, then passed after the mapping fix. Actual Three.js camera projections verify both directions at four compass headings. Reverse uses the same wheel steering geometry.
 
-Every body now has its own acceleration, speed limits, braking, wheelbase, steering response, grip, drift and collision mass from dist/handling.js. Vehicle IDs govern both physics and the original Blender mesh, including saved selection and restarts. These are original arcade balance values, not manufacturer specifications. The accepted five body geometry and 22 editable Blender scenes remain.
+Every body now has its own acceleration, speed limits, braking, wheelbase, steering response, grip, drift and collision mass from dist/handling.js. Vehicle IDs govern both physics and the original Blender mesh, including saved selection and restarts. These are original arcade balance values, not manufacturer specifications. The accepted five exterior body scenes remain unchanged; the new cabin increases the source total to 23 editable Blender scenes.
 
 The garage offers Circuit and Pursuit. Circuit keeps two ordered laps, three rivals and four traffic cars. Pursuit has traffic and an initial interceptor, with reinforcements at 20 and 45 simulation seconds. Active officers follow the road, intercept the player's lane and physically collide; they never teleport. Inactive officers do not render or collide. Police lamps flash during day and night. Synthesized siren level follows contact distance and stops outside active pursuit.
 
@@ -40,11 +54,11 @@ Baseline and final measurements are in docs/specs/0001-city-racer/performance.js
 
 ## Verification
 
-* `npm test`: 39 tests cover prior driving/checkpoint/record rules, five distinct setups, five complete Circuit races, five physically completed escapes, an actual police bust, no active patrol teleportation, reinforcements, collision momentum, pursuit pause/recovery/results and profile compatibility. Actual app handlers exercise every car/setting combination into the matching Pursuit countdown. Keyboard directions, opposed inputs, stick dead zone, D pad and focus loss are covered. Auto timing/bounds and siren distance/mute/resource reuse are covered.
-* `npm run check:model`: 15 actual scene tests plus all five GLB assertions. Actual chase projection at four headings, wheel steering from physics, active/inactive patrol meshes/lights, Auto shadows/resolution, grounding, finite transforms, hood lamp clearance, paint/brake isolation, restart ownership, night headlights, garage views and a complete legal Circuit are covered. The GPU render call is replaced.
+* `npm test`: 43 tests cover prior driving/checkpoint/record rules, five distinct setups, five complete Circuit races, five physically completed escapes, an actual police bust, no active patrol teleportation, reinforcements, collision momentum, pursuit pause/recovery/results and profile compatibility. Actual app handlers exercise every car/setting combination into the matching Pursuit countdown. Keyboard directions, opposed inputs, stick dead zone, D pad and focus loss are covered. Auto timing/bounds and siren distance/mute/resource reuse are covered. Four added actual-handler tests cover all menu groups, gamepad direction edges/neutral release, every camera input path, temporary rear view, tracking rotation, saved camera restoration and native dialog input.
+* `npm run check:model`: 18 actual scene tests plus all five GLB assertions. Actual chase projection at four headings, wheel steering from physics, active/inactive patrol meshes/lights, Auto shadows/resolution, grounding, finite transforms, hood lamp clearance, paint/brake isolation, restart ownership, night headlights, garage views and a complete legal Circuit are covered. Three added checks cover every driving preset on all five bodies at four headings, clear forward rays and visible controls in all five cabins, actual wheel/needle animation, held rear restoration, reduced motion and shared resources after restart. The GPU render call is replaced.
 * `npm run check:world`: fourteen scenery/road/lamp GLBs retain finite geometry and expected materials/bounds/triangle totals. Three placement sets stay clear and grounded. Spatial batches retain every instance and triangle with limited bounds. Five actual theme switches preserve sky/reflections/light restoration and shared assets.
-* `npm run check`: 13 modules parse; imports, UI IDs, vehicle/scenery/font/image assets and hosting configuration resolve.
-* `git diff --check`: clean. Static runtime remains approximately 36 MB. No new dependencies or remote runtime requests were added.
+* `npm run check`: 16 modules parse; imports, UI IDs, vehicle/scenery/font/image assets and hosting configuration resolve.
+* `git diff --check`: clean. Static runtime is 39,310,855 bytes (37.5 MiB), including the new local cabin and title artwork. No new dependencies or remote runtime requests were added.
 
 The DOM fixture executes actual handlers and simulation but does not render browser layout. Audio fixtures verify parameters and muting, not audible quality.
 
@@ -60,12 +74,12 @@ The five Blender vehicles retain their checked shapes, front lamps, connected sp
 | Kestrel R4 | 2.182 × 1.471 × 4.600 | 78,444 |
 | Vanguard M5 | 2.187 × 1.336 × 4.600 | 78,776 |
 
-Widths include mirrors. Five vehicle scenes, fourteen prototypes and three composed circuits make 22 editable .blend files. Original scripts, 30 vehicle views, scene previews, menu imagery, local OFL fonts and the Windows rebuild script remain included. This release changes gameplay/batching and does not regenerate the accepted models. Commercial screenshots, downloaded meshes and gameplay frames are not shipped as assets.
+Widths include mirrors. Five vehicle scenes, fourteen prototypes and three composed circuits plus the driver cabin make 23 editable .blend files. Original scripts, 30 vehicle views, scene previews, menu imagery, local OFL fonts and the Windows rebuild script remain included. This release adds a cabin and camera/menu behavior and does not regenerate accepted exterior models or scenery. Seven new Blender previews inspect all five driver placements, night instrument visibility and the front tracking pose on a simple road. Their lighting and environment are asset evidence, not WebGL gameplay captures. Commercial screenshots, downloaded meshes and gameplay frames are not shipped as assets.
 
 ## Browser checks still open
 
 Supported control-browser preview is unavailable in this managed workspace. Browser GPU shading, texture upload, transparency sorting, responsive menu appearance, physical gamepads, audible siren balance and FPS remain unverified. Node timings, camera geometry and fixtures cannot establish those outcomes.
 
-For hardware verification, select each car and scene, drive left/right and reverse, try both events, use pause/recovery/restart, and switch High/Reduced/Auto with the FPS overlay enabled. Check front/rear/side inspection, night road visibility and menu scrolling at the target display size. Compare frame rate on the same route before judging GPU performance.
+For hardware verification, select each car and scene, drive left/right and reverse, try both events, use pause/recovery/restart, and switch High/Reduced/Auto with the FPS overlay enabled. Check all five camera presets, bracket rotation, held rear restoration, front/rear/side garage inspection, night road visibility, arrow-key focus/choices and one-view garage/briefing fit at 1363 × 652, 1100 × 600 and a smaller display. Check native dialogs and held gamepad menu input before accelerating. Compare frame rate on the same route before judging GPU performance.
 
 Reference similarity remains an approximation of the supplied footage/photos. Reflections are environment based; dynamic nearby car/tree reflections are absent. Career, upgrades, player tuning, more routes and touch driving remain future work.

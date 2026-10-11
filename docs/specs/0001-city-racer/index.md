@@ -1,6 +1,6 @@
 # 0001 City racer
 
-**Status**: Implemented, 1.6.0; browser verification limits are in BUILD-REPORT.md
+**Status**: Implemented, 1.7.0; browser checks remain open in BUILD-REPORT.md
 **Date**: 2026-10-11
 **Authorized by**: User, Accept and build, then proceed with all remaining steps.
 
@@ -220,3 +220,52 @@ Profile retains version 1 and the same storage key. Add `mode` default circuit, 
 This keeps the existing original Blender assets and local game architecture. Direct engine replacement would require rewriting working gameplay and scenes. A separate racing physics library could add tire realism but would make tuning and coordinate migration much broader than this task. Spatial batching permits culling without removing scenery or changing original asset files, but increases visible draw calls; GPU benefit must be checked on actual hardware. Auto graphics responds to frame time rather than guessing a device's performance. Pursuit is an original arcade event and does not include a career, weapons or recreated commercial pursuit systems.
 
 The baseline benchmark uses actual exported scenery and 48 camera poses per theme. Mean submitted scenery triangles are 3,281,149 forest, 3,269,096 alpine and 3,371,133 night. Whole circuit bounding spheres keep nearly every instance in the visible batch. Node CPU scene timing is separate from GPU FPS. The managed browser skill is unavailable in this session, so supported browser QA remains explicitly blocked while simulation, scene math, ownership and file checks continue.
+
+## Driving cameras and onboarding, 2026-10-11
+
+### Summary and requirements
+You can change the driving view during either event. A front three quarter tracking view follows the supplied red car image. A Blender cabin puts the camera behind a detailed wheel and dashboard. Brighter artwork and a compact garage keep the choices readable together.
+
+AC-30: Offer Chase, Wide chase, Tracking, Hood and Cockpit during Circuit and Pursuit. V, gamepad LB and a HUD button cycle views. Tracking starts at a front three quarter angle; brackets or HUD angle buttons rotate it. C or RB temporarily looks behind and returns to the chosen view. Camera changes preserve driving controls and event state.
+AC-31: Cockpit includes original Blender wheel, instrument cluster, vents and console. Wheel and gauge needles follow the real car state. Every body has its own seat/hood position. The road remains clear of opaque glazing and old cabin meshes. Interior/exterior changes snap without passing through the body. All five cars and day/night work, with extra corner look disabled under reduced motion.
+AC-32: Use a bright original car background and restrained text scrim. Keep local Barlow fonts and readable copy. Show driving, power, camera and recovery controls together in the desktop briefing.
+AC-33: At desktop sizes of at least 1100 by 600, show event, car, setting, paint, inspection and Start choices without scrolling. Explicit compact image heights override the stretched HTML image heights observed in the screenshot. Smaller screens retain scrolling with every choice reachable.
+AC-34: Up/Down move between garage choice groups. Left/Right select with visible focus and the same behavior as clicking. Enter activates the focused action. Gamepad D pad or left stick navigates on direction edges; A confirms. Title, briefing, pause and results also support arrows. Dialog fields keep native behavior. Menu navigation never becomes held driving input.
+AC-35: Validate and persist camera ID and finite wrapped tracking yaw in the existing profile. Preserve records and earlier settings. Verify real camera projections, rig animation, restart ownership and actual app handlers. Publish the existing Site and replace the same complete source ZIP. Document browser/GPU/layout limits separately from asset renders and fixtures.
+
+### Decision and feature design
+Extend the working renderer and menus in place with a small camera module and one reusable Blender cockpit kit. Replacing the engine would discard accepted assets and gameplay. A flat dashboard overlay would be simpler but would not provide the requested 3D cabin. Use end to end slices, the existing project approach, and no new dependencies.
+
+Chase retains its accepted rear pose. Wide uses an 11.5 metre rear distance and 3.8 metre height. Tracking circles at 7.5 metres and 1.45 metre height, looking at the car, with initial yaw -.72 radians. Brackets change yaw at .9 radians per second; HUD angle buttons step .18 radians. Yaw wraps within plus or minus pi. Cockpit uses a 76 degree field of view and .035 metre near plane. Corner look is bounded to .12 radians. Other field of view values live in the camera catalog. These are original game camera choices.
+
+| Body | Driver eye, local X/Y/Z metres | Cabin lift | Hood eye Y |
+| --- | --- | --- | --- |
+| hypercar | -.35, 1.015, -.24 | 0 | .84 |
+| spyder | -.35, 1.015, -.20 | 0 | .84 |
+| interceptor | -.35, 1.11, -.22 | .07 | .95 |
+| rally | -.35, 1.24, -.32 | .19 | 1.04 |
+| muscle | -.35, 1.13, -.25 | .10 | 1.01 |
+
+Seat positions may be tuned against the real exported surfaces and authored previews to eliminate obstruction. The kit shares geometry/materials and only appears on the player in cabin mode. Original cabin leather, glazing and a separate painted roof triangle group temporarily hide, then restore in exterior/rear views. The roof split was required by actual forward ray checks; exterior GLBs, silhouette and triangle totals are unchanged. Close windshield trim follows the seat eye, and the open spyder omits its header. Wheel rotation derives from actual steering angle. Speed/RPM needle rotation derives from speed and gear. This adds no extra render pass or reflected mirror camera.
+
+| Action | Produced value | Source |
+| --- | --- | --- |
+| Cycle camera | Selected view and label | Ordered validated camera catalog, V/LB edge or HUD click |
+| Tracking angle | Wrapped yaw and pose | Stored yaw plus bracket hold or HUD step |
+| Camera pose | Eye, target, field of view, near plane | Preset, seat table, car position/heading/speed/steer, reduced motion |
+| Cabin animation | Wheel/gauge transforms and visibility | Current rig, steering angle, speed, derived gear/RPM, effective view |
+| Rear hold | Temporary exterior camera | C/RB hold; selected preset retained |
+| Navigate menu | Focus and active choice | Actual enabled controls on current screen and direction edges |
+| Save camera | Camera ID and yaw | Catalog membership and finite wrapped value; prior profile fields retained |
+| Title artwork | Local bright background | Imagegen using authored Apex reference; exact prompt included in source |
+
+### Build plan
+- [x] AC-30, AC-31, AC-35: Wire camera selection through input, scene and HUD; add presets and the Blender cabin.
+- [x] AC-32, AC-33: Integrate bright artwork, compact briefing and explicit thumbnail sizes.
+- [x] AC-34, AC-35: Add focus navigation and validated persistence with actual handler checks.
+- [x] AC-30, AC-31, AC-32, AC-33, AC-34, AC-35: Check projections, geometry, inputs, assets and regressions; document limits and prepare the release/source.
+
+### Consequences and references
+Front tracking is a cinematic view of the car and road behind it. Chase, hood and cockpit show the next turn. The shared dashboard has different seat placement by body; mirrors and driver arms are not included. Generated title art is a marketing image, not a browser screenshot. Browser appearance and physical controllers remain open when supported preview is unavailable.
+
+The four supplied screenshots are the direct visual references. EA's Heat guide documents separate camera toggle and look controls: https://www.ea.com/able/resources/need-for-speed/need-for-speed-heat/pc/control-settings . EA's SHIFT manual describes outside and in helmet perspectives: https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/24870/manuals/NFSSHpcMAN(US).pdf?t=1759355309 . These inform independent choices; no commercial reference imagery or geometry is shipped.

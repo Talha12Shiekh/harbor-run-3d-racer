@@ -1,6 +1,6 @@
-# Harbor Run 1.6.0
+# Harbor Run 1.7.0
 
-An original 3D arcade racer with five Blender authored vehicles, daylight forest/alpine scenery and a night forest setting inspired by the supplied Hot Pursuit footage. Circuit racing and police pursuits, four traffic cars, distinct handling, nitrous, Speedbreaker, keyboard and standard gamepad controls. All current vehicle and scenery geometry is authored for this project; the earlier downloaded sedan and city assets have been retired.
+An original 3D arcade racer with five Blender authored vehicles, daylight forest/alpine scenery and a night forest setting inspired by the supplied Hot Pursuit footage. Circuit racing and police pursuits, four traffic cars, distinct handling, five driving cameras, an animated Blender cabin, nitrous, Speedbreaker, keyboard and standard gamepad controls. All current vehicle and scenery geometry is authored for this project; the earlier downloaded sedan and city assets have been retired.
 
 ## Play
 
@@ -11,9 +11,9 @@ cd dist
 python3 -m http.server 8080
 ```
 
-Open http://localhost:8080 in a desktop browser with WebGL and hardware acceleration. File URLs cannot load the module/asset workflow. All assets are local; there are no runtime CDN requests. The shipped runtime is approximately 36 MB; cache and unused textures affect actual transfer.
+Open http://localhost:8080 in a desktop browser with WebGL and hardware acceleration. File URLs cannot load the module/asset workflow. All assets are local; there are no runtime CDN requests. The shipped runtime is approximately 38 MB; cache and unused textures affect actual transfer.
 
-Enter the garage from the cinematic title. The optional first visit briefing can be skipped or reopened later. Choose Apex H1 (hypercar), Strada S2 (open spyder), Sentinel I3 (interceptor), Kestrel R4 (rally sedan) or Vanguard M5 (muscle coupe). Thumbnail buttons and labelled dropdowns choose the same body. Scene cards choose Redwood Ridge, Summit Pass or Midnight Run. Choose paint, inspect front/rear/both sides/angled/orbit camera views and start. Car changes apply that body's default finish; subsequent paint choices are independent. Existing valid settings and best times survive.
+Enter the garage from the cinematic title. The optional first visit briefing can be skipped or reopened later. Choose Apex H1 (hypercar), Strada S2 (open spyder), Sentinel I3 (interceptor), Kestrel R4 (rally sedan) or Vanguard M5 (muscle coupe). Labelled thumbnail buttons choose the body. Up/Down move between groups; Left/Right choose within the group; Enter activates the focused action. All desktop choices fit together at 1100 × 600 and larger. Smaller screens retain scrolling. Scene cards choose Redwood Ridge, Summit Pass or Midnight Run. Choose paint, inspect front/rear/both sides/angled/orbit camera views and start. Car changes apply that body's default finish; subsequent paint choices are independent. Existing valid settings and best times survive.
 
 Midnight Run adds a procedural night sky, cool moonlight, 32 original roadside lamps, four nearby warm light pools, two player headlights and brighter rear lamps. Selecting daytime restores daytime lighting and sky. Each car now has its own arcade acceleration, braking, steering, grip, drift, mass and speed limits. The garage describes the actual driving character. These are original game balance values, not real manufacturer specifications.
 
@@ -21,7 +21,9 @@ Choose Circuit or Pursuit above the garage car choices. Circuit keeps the two la
 
 Auto graphics responds to sustained frame rate by changing resolution within a .65 to 1.5 pixel ratio cap, and can disable shadows when resolution reaches .8. High keeps full configured quality; Reduced stays .8 with shadows off. Settings can show live FPS, draw calls, triangles and resolution during play. These are measured in your browser. Spatial scenery batches retain all original placements and let the camera cull distant/outside batches.
 
-Car, event, scenery, paint, briefing completion, graphics, sound, stats display and valid records persist in browser localStorage when available.
+During either event, V, gamepad LB or the VIEW button cycles Chase, Wide chase, Tracking, Hood and Cockpit. Tracking starts at a front three quarter angle; hold brackets or use its angle buttons to circle the car. Cockpit shows a real 3D wheel, stitched dash, vents, console and moving instrument needles. The open spyder omits the roof header. C/RB temporarily looks behind, then restores the selected camera.
+
+Car, event, scenery, paint, driving view, tracking angle, briefing completion, graphics, sound, stats display and valid records persist in browser localStorage when available.
 
 ## Controls and rules
 
@@ -34,9 +36,13 @@ Car, event, scenery, paint, briefing completion, graphics, sound, stats display 
 | Nitrous | Shift | B |
 | Speedbreaker | Q | X |
 | Recover car on road | R | Y |
+| Cycle driving view | V or VIEW button | LB |
+| Rotate tracking view | Hold [ / ] or angle buttons | Angle buttons |
 | Hold rear view | C | RB |
 | Pause / resume | Escape | Start |
-| Advance title/briefing or start race | Enter or menu button | Start |
+| Navigate menu groups / choices | Up/Down / Left/Right | D pad or left stick |
+| Confirm focused menu action | Enter | A |
+| Advance title/briefing or start race | Focus action then Enter | Start |
 
 Complete eight ordered forward checkpoints per lap, twice. Reverse crossings and skipped checkpoints do not count. Reset does not grant progress. Car contacts and road edges reduce speed. Records update only after completing the race. Changing tabs or disconnecting a controller pauses it. Nitrous recharges while driving; Speedbreaker slows the simulation to 40 percent while improving steering response.
 
@@ -52,6 +58,7 @@ Extract the entire source ZIP before opening files. Blender 4.5.3 LTS authored t
 
 | Editable file | Contents |
 | --- | --- |
+| assets-src/cockpit/cockpit.blend | Original stitched dashboard, wheel, windshield trim, console, vents and animated needles |
 | assets-src/vehicles/hypercar.blend | Curved blue hypercar, canopy, interior, aero, lamps and wheels |
 | assets-src/vehicles/spyder.blend | Red open cockpit spyder with windscreen and roll hoops |
 | assets-src/vehicles/interceptor.blend | Rounded police car, original lettering and lightbar |
@@ -86,10 +93,12 @@ Equivalent Blender commands on any platform:
 
 ```sh
 blender --background --factory-startup --python assets-src/build_video_cars.py
+blender --background --factory-startup --python assets-src/build_cockpit.py
 blender --background --factory-startup --python assets-src/build_wilderness.py
 blender --background --factory-startup --python assets-src/build_night.py
 blender --background --factory-startup --python assets-src/render_wilderness.py
 blender --background --factory-startup --python assets-src/render_ui.py
+blender --background --factory-startup --python assets-src/render_cockpit.py
 ```
 
 Add `-- --render` to the vehicle command for six views per car. The saved circuit and placement inputs are included, so these commands do not require Node or additional Python packages. If you change the circuit, run `node --loader ./tests/three-resolver.mjs assets-src/prepare_preview.mjs` before rebuilding its scenery/render. Optional `make_textures.py` regeneration requires Pillow and NumPy; all needed maps are already included.
@@ -119,6 +128,10 @@ npm run check:model
 npm run check:world
 node --loader ./tests/three-resolver.mjs scripts/benchmark.mjs
 ```
+
+The source contains 23 editable Blender scenes. Cockpit renders are in `assets-src/cockpit/previews`; they use the actual shipped GLBs and driver poses, on a simple road for placement inspection. Accepted exterior car GLBs and scenery are unchanged. Runtime separates painted roof triangles for interior visibility, then restores them in every outside view. The player cabin shares geometry and materials across restarts.
+
+The brighter title background, `dist/assets/ui/title-v2.jpg`, was generated with builtin Imagegen using the original Apex thumbnail as its reference. The exact prompt is in `assets-src/title-art-prompt.txt`. It is marketing artwork; garage thumbnails and scenery panels remain renders of the authored models.
 
 ## Reference and limits
 

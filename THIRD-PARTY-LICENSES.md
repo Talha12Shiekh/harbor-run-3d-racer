@@ -2,7 +2,7 @@
 
 ## Original Blender models
 
-The five vehicles in `dist/assets/vehicles` and fourteen scenery/road/lamp prototypes in `dist/assets/wilderness` were authored for Harbor Run from original Blender surface sections and primitives. Editable scenes and authoring scripts are in `assets-src`. No downloaded vehicle or scenery geometry is used by this release. The previous independently licensed sedan and city presentation can be recovered from earlier Git versions.
+The five vehicles and the animated cockpit kit in `dist/assets/vehicles`, and fourteen scenery/road/lamp prototypes in `dist/assets/wilderness` were authored for Harbor Run from original Blender surface sections and primitives. Editable scenes and authoring scripts are in `assets-src`. No downloaded vehicle or scenery geometry is used by this release. The previous independently licensed sedan and city presentation can be recovered from earlier Git versions.
 
 The supplied Hot Pursuit footage informed visible proportions and scene composition. No extracted Need for Speed code, music, models, textures, tracks or video frames are distributed. Original police lettering and signs contain no copied game livery or manufacturer emblems. The reconstruction does not imply endorsement.
 
@@ -33,3 +33,7 @@ Blender is an authoring tool and is not redistributed. The source package contai
 Designed by Jeremy Tribby. Source distribution: Google Fonts, `ofl/barlow` and `ofl/barlowcondensed` in https://github.com/google/fonts.
 
 Files in `dist/assets/fonts`: Barlow Regular and SemiBold, Barlow Condensed Bold and ExtraBold Italic. SIL Open Font License 1.1. The complete license texts are retained beside the font files as `barlow-OFL.txt` and `barlowcondensed-OFL.txt`. Fonts are served locally.
+
+## Original title artwork
+
+`dist/assets/ui/title-v2.jpg` was made with builtin Imagegen using the project's original Apex render as reference. It contains no commercial game screenshot or downloaded car artwork. The full prompt is retained in `assets-src/title-art-prompt.txt`. Garage car thumbnails and scene panels are original Blender renders.

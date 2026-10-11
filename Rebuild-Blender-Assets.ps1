@@ -16,6 +16,8 @@ try {
     if ($RenderVehicles) { $VehicleArgs += @('--', '--render') }
     & $BlenderPath @VehicleArgs
     if ($LASTEXITCODE -ne 0) { throw 'Vehicle build failed.' }
+    & $BlenderPath --background --factory-startup --python assets-src/build_cockpit.py
+    if ($LASTEXITCODE -ne 0) { throw 'Cockpit build failed.' }
     & $BlenderPath --background --factory-startup --python assets-src/build_wilderness.py
     if ($LASTEXITCODE -ne 0) { throw 'Scenery build failed.' }
     & $BlenderPath --background --factory-startup --python assets-src/build_night.py

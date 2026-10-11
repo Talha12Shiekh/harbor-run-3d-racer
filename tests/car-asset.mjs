@@ -7,6 +7,8 @@ import {World,prepareCar,cloneCar} from '../dist/world.js';
 import {Race,createTrack,aiInput,STEP,integrate} from '../dist/sim.js';
 import {wheelSteering} from '../dist/handling.js';
 import {VEHICLES} from '../dist/catalog.js';
+import {DRIVING_VIEWS,SEATS,cameraPose} from '../dist/cameras.js';
+import {prepareCockpit} from '../dist/cockpit.js';
 globalThis.self=globalThis;
 // Geometry validation uses an image metadata stub. It does not test GPU texture upload.
 globalThis.createImageBitmap=async()=>({width:1024,height:1024,close(){}});
@@ -24,13 +26,15 @@ for(const metadata of catalog.vehicles){
 }
 console.log(JSON.stringify({originalVehicles:reports,groundedWheels:true,materialIsolation:true,gpuRendering:'not exercised'},null,2));
 const template=templates.get('hypercar');
+const cockpitBytes=await readFile(new URL('../dist/assets/vehicles/cockpit.glb',import.meta.url));
+const cockpitTemplate=prepareCockpit(await new GLTFLoader().parseAsync(cockpitBytes.buffer.slice(cockpitBytes.byteOffset,cockpitBytes.byteOffset+cockpitBytes.byteLength),''));
 
 // Run the real scene update with only the GPU render call replaced.
 // This validates transforms and state integration, not browser visuals or FPS.
 function makeWorld(){
  const track=createTrack();
  const world=Object.assign(Object.create(World.prototype),{
-  track,race:new Race(track),template,templates,vehicle:'hypercar',contactTexture:new THREE.Texture(),
+  track,race:new Race(track),template,templates,cockpitTemplate,vehicle:'hypercar',contactTexture:new THREE.Texture(),
   scene:new THREE.Scene(),camera:new THREE.PerspectiveCamera(61,1,.1,2400),
   sun:new THREE.DirectionalLight(),look:new THREE.Vector3(),time:0,carMeshes:[],
   renderCalls:0,
@@ -40,6 +44,35 @@ function makeWorld(){
  return world;
 }
 const near=(actual,expected,message)=>assert.ok(Math.abs(actual-expected)<1e-6,message??`${actual} != ${expected}`);
+
+test('AC-30 all five actual cameras frame every body at every compass heading without changing the event',()=>{
+ const w=makeWorld();
+ for(const id of templates.keys())for(const heading of [0,Math.PI/2,Math.PI,Math.PI*1.5]){
+  w.setVehicle(id);Object.assign(w.race.player,{heading,speed:28,x:200,z:400,y:8});
+  for(const view of DRIVING_VIEWS){const before=JSON.stringify(w.race);w.setDrivingView(view.id);w.update(1/60);assert.equal(JSON.stringify(w.race),before);assert.ok(w.camera.position.toArray().every(Number.isFinite));assert.ok(w.camera.fov>=45&&w.camera.fov<=80);w.camera.updateMatrixWorld(true);
+   const pose=cameraPose(w.race.player,view.id,w.trackingYaw??-.72),projected=new THREE.Vector3(...pose.look).project(w.camera);near(projected.x,0);near(projected.y,0);
+   if(view.id==='tracking'){const p=w.race.player;assert.ok((w.camera.position.x-p.x)*Math.sin(heading)+(w.camera.position.z-p.z)*Math.cos(heading)>0,'Tracking must expose the front three quarter view');}
+  }
+ }
+});
+test('AC-31 actual cockpit has a clear forward view and visible wheel and dials in all five bodies',()=>{
+ const w=makeWorld();w.setDrivingView('cockpit');const ray=new THREE.Raycaster();
+ for(const id of templates.keys()){
+  w.setVehicle(id);w.update(1/60);w.scene.updateMatrixWorld(true);w.camera.updateMatrixWorld(true);
+  const car=w.carMeshes[0],rig=car.userData.cockpit;assert.equal(rig.visible,true);assert.ok(car.userData.cabinMeshes.every(m=>m.visible===false));near(w.camera.near,.035);near(rig.position.y,SEATS[id].lift);
+  for(const key of ['steering','speed','rpm']){const p=rig.userData[key].getWorldPosition(new THREE.Vector3()).project(w.camera);assert.ok(Math.abs(p.x)<1&&Math.abs(p.y)<1,'The '+key+' is outside the driver view for '+id);}
+  for(const point of [[0,.1],[0,.6],[-.28,.25],[.28,.25]]){
+   ray.setFromCamera(new THREE.Vector2(...point),w.camera);const meshes=[];car.traverse(o=>{if(!o.isMesh)return;for(let a=o;a;a=a.parent)if(!a.visible)return;meshes.push(o);});const hits=ray.intersectObjects(meshes,false);assert.equal(hits.length,0,'Opaque body/cabin obstructs forward view for '+id+' at '+point+': '+hits.map(h=>h.object.material.name+' @ '+h.distance.toFixed(3)).join(', '));
+  }
+ }
+});
+test('AC-31 rear hold restores body/glazing and returns to a moving animated driver rig',()=>{
+ const w=makeWorld();w.setDrivingView('cockpit');w.race.player.steer=.7;w.race.player.speed=32;w.update(1/60);let rig=w.carMeshes[0].userData.cockpit;
+ near(rig.userData.steering.rotation.z,wheelSteering(w.race.player)*3.2);const speed=rig.userData.speed.rotation.z;w.race.player.speed=52;w.update(1/60);assert.ok(rig.userData.speed.rotation.z>speed);
+ w.update(1/60,true);assert.equal(w.drivingView,'cockpit');assert.equal(rig.visible,false);assert.ok(w.carMeshes[0].userData.cabinMeshes.every(m=>m.visible));w.update(1/60,false);assert.equal(rig.visible,true);
+ const car=w.race.player,normal=cameraPose(car,'cockpit',-.72,false,false),still=cameraPose(car,'cockpit',-.72,false,true);assert.notDeepEqual(normal.look,still.look);
+ w.race.restart();w.attachCars();w.update(1/60);const next=w.carMeshes[0].userData.cockpit;assert.notEqual(next,rig);assert.equal(next.userData.steering.children[0].geometry,rig.userData.steering.children[0].geometry);assert.notEqual(next.userData.steering,rig.userData.steering);assert.equal(next.visible,true);
+});
 
 test('AC-15 each selected vehicle uses its own geometry and diversifies rivals',()=>{
  const w=makeWorld();
