@@ -1,6 +1,6 @@
 # 0001 City racer
 
-**Status**: In Progress
+**Status**: Implemented, 1.4.0; browser verification limits are in BUILD-REPORT.md
 **Date**: 2026-10-11
 **Authorized by**: User, Accept and build, then proceed with all remaining steps.
 
@@ -93,3 +93,35 @@ Camera and lighting parameters are explicit in world.js. Lower the chase camera 
 All racers and traffic share one detailed model. More triangles improve panel and cabin detail but add rendering cost; browser FPS must be measured. Blender renders verify the authored asset and exported geometry, not the game GPU. Subjective similarity, transparency sorting and controller hardware remain manual checks. Reverting this release commit restores the old asset path and source. Profiles require no migration.
 
 Reasoning and sources: see rationale.md.
+
+## Video world and original assets, authorized 2026-10-11
+
+### Summary
+The video now defines the scenery and car direction. Replace the city presentation and downloaded sedan base with original Blender geometry: a blue mid-engine hypercar, an open spyder and a rounded interceptor, plus forest and alpine scenery. Deliver editable scenes and portable rebuild scripts for the user's installed Blender.
+
+### Requirements
+AC-15: All new vehicle and scenery geometry is authored for this project without importing downloaded meshes. Cars have distinct silhouettes, curved panels, grounded wheels, interior, front/rear lamps, intakes, exhausts and aero parts. Existing game controls and legal race rules remain.
+AC-16: Forest and alpine presentation replace city repetition. Detailed conifers, rocky banks, layered mountains, road shoulders, guardrails, power poles, roadside signs, water and original terrain establish the setting visible in the footage. The road remains unobstructed and grounded.
+AC-17: Garage selectors choose the three car bodies and forest/alpine scenery. Choices persist with validated settings. Body changes reuse the wheel/material contract. Reduced graphics remains available. Different bodies appear among rivals/traffic.
+AC-18: Export runtime GLBs, original editable Blender scenes, measurements, multi-view renders, a Windows Blender rebuild script, source credit records and validation results. Publish to the same Site and replace the same source ZIP.
+
+### Decision and sources
+Use Blender 4.5.3 for original surface and asset authoring, Three.js for local rendering. Vehicle profiles and measured control points come from the blue hypercar, red spyder and police car visible in the attached MP4, supplemented by manufacturer dimension references. The footage provides composition and visible surface evidence, not CAD dimensions or hidden geometry. Exact commercial asset identity and pixel-perfect match are not promised.
+
+Create assets-src/build_video_cars.py and assets-src/build_wilderness.py. The vehicle script uses curved surface sections, wheel arch cuts and separate lamp/intake/cabin geometry, not imported meshes. The scenery script exports original reusable GLBs, editable prototypes and composed circuit scenes. dist/wilderness.js instances the kit with deterministic placement and terrain derived from track samples, rejecting props intersecting the driving corridor. Forest and alpine use the same legal loop with different vegetation, terrain materials, distant peaks, atmosphere and surface presentation. This does not recreate unknown unseen sections of the original game's map.
+
+Keep current track samples, width, checkpoints and elevation while changing their presentation. Race collision and car placement use the existing simulation. Car meshes normalize to the established 4.6 metre runtime contract; wheel centers and radius come from each export. Profile fields vehicle and environment accept only hypercar/spyder/interceptor and forest/alpine, with defaults hypercar and forest. Existing valid paint/volume/quality/records survive. Selector changes are allowed in the garage and rebuild only owned scene instances, preserving shared assets.
+
+Use original Blender materials and existing credited daylight/asphalt maps where appropriate. No downloaded geometry or extracted game textures are used by the new kit. Playback evidence remains the 97 directly inspected samples across the attached 16:05 video, with additional close views inspected for vehicle detail. Weather and light are explicit per environment. PBR environment reflections remain distinct from real-time planar reflections.
+
+### Build plan
+- [x] AC-15, AC-18: Author three original car bodies, details and wheel pivots; inspect multi-view renders and exported geometry.
+- [x] AC-16, AC-18: Author scenery kit, original terrain and two visual settings; inspect a Blender road preview and placement bounds.
+- [x] AC-15, AC-17: Integrate asset catalog and garage choices with validated persistence; preserve wheel/brake/paint ownership and race rules.
+- [x] AC-16, AC-18: Run driving, geometry, texture and scene checks and prepare publication/source replacement. Native delivery results record the deployed version and source ZIP version.
+
+### Consequences
+This is an original reconstruction of visible forms and atmosphere. Authoring rather than downloading gives editable control but does not itself guarantee AAA quality. Full browser appearance and FPS remain unverified until supported preview tools are available. The downloaded sedan and city kit can be recovered from previous Git versions. No remote access to the user's PC is implied; the included .blend files and Windows script run in the user's Blender.
+
+### Implemented assets and evidence
+Three original vehicles and thirteen scenery/road exports replace the prior imported sedan and city. Original terrain and road/shoulder geometry are authored in Blender against the unchanged legal circuit. Garage selectors persist validated choices; rivals/traffic use different bodies. BUILD-REPORT.md records measurements, 12 driving tests, 9 vehicle scene tests, both clear placement sets, image decoding and 18 vehicle/2 world authoring renders. README.md records local Blender/Windows rebuilding. Exact model/map matching and GPU FPS remain explicit limits.

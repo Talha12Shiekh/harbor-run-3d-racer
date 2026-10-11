@@ -8,25 +8,27 @@ import {Race,createTrack,aiInput,STEP} from '../dist/sim.js';
 globalThis.self=globalThis;
 // Geometry validation uses an image metadata stub. It does not test GPU texture upload.
 globalThis.createImageBitmap=async()=>({width:1024,height:1024,close(){}});
-const b=await readFile(new URL('../dist/assets/tuner-sedan.glb',import.meta.url));const gltf=await new GLTFLoader().parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'');
-const template=prepareCar(gltf),car=cloneCar(template,'#245f78');car.updateMatrixWorld(true);const size=new THREE.Box3().setFromObject(car).getSize(new THREE.Vector3());assert.ok(size.z>4.4&&size.z<4.7);assert.ok(size.x>1.5&&size.x<2.3);assert.ok(size.y>1.2&&size.y<1.5);assert.equal(car.userData.wheelGroups.length,4);assert.ok(car.userData.paints.length>0);assert.ok(car.userData.brakes.length>0);let meshes=0,triangles=0;car.traverse(o=>{if(o.isMesh){meshes++;triangles+=o.geometry.attributes.position.count/3;for(const n of o.geometry.attributes.position.array)assert.ok(Number.isFinite(n));}});for(const w of car.userData.wheelGroups){const s=new THREE.Box3().setFromObject(w).getSize(new THREE.Vector3());assert.ok(s.y>.2&&s.z>.2);assert.ok(Math.abs(new THREE.Box3().setFromObject(w).min.y)<.003,'Tires must meet the ground');}
-console.log(JSON.stringify({dimensionsMetres:size.toArray().map(x=>+x.toFixed(3)),mergedMeshes:meshes,triangles,wheels:4,finiteGeometry:true,gpuRendering:'not exercised'},null,2));
-
-const second=cloneCar(template,'#b72227');
-assert.notEqual(car.userData.paints[0],second.userData.paints[0]);
-assert.equal(second.userData.paints[0].color.getHexString(),'b72227');
-let glazing=0,glazingOpacity=0,vinyl=0,frontLampZ=-Infinity,rearLampZ=Infinity;
-car.traverse(o=>{if(!o.isMesh)return;const m=o.material,b=new THREE.Box3().setFromObject(o);if(m.name==='Glass glazing'){glazing++;glazingOpacity=m.opacity;assert.equal(m.transparent,true);assert.ok(m.opacity>.1&&m.opacity<.7);assert.equal(m.depthWrite,false);}if(m.name==='Vinyl graphic'){vinyl++;assert.ok(m.map);assert.equal(m.color.getHexString(),'ffffff');}if(m.name==='Projector light')frontLampZ=Math.max(frontLampZ,b.max.z);if(m.name==='Brakelight red'){rearLampZ=Math.min(rearLampZ,b.min.z);assert.ok(m.color.r>m.color.g*10);}});
-assert.equal(glazing,1);assert.equal(vinyl,1);assert.ok(frontLampZ>1.9);assert.ok(rearLampZ< -1.9);
-for(const group of car.userData.wheelGroups){assert.ok((group.name.includes('Front')?group.position.z:-group.position.z)>1.3);group.traverse(o=>{if(o.isMesh)assert.notEqual(o.material.name,'Red caliper','Brake calipers must stay fixed');});const original=new THREE.Box3().setFromObject(group);group.rotation.x=Math.PI/3;car.updateMatrixWorld(true);const spun=new THREE.Box3().setFromObject(group);assert.ok(Math.abs(original.getCenter(new THREE.Vector3()).y-spun.getCenter(new THREE.Vector3()).y)<.015,'Wheel pivot is eccentric');group.rotation.x=0;}
-console.log(JSON.stringify({materialIsolation:true,frontAxis:'+Z',glazingOpacity,vinylPresent:true,wheelSpinCentersStable:true}));
+const catalog=JSON.parse(await readFile(new URL('../dist/assets/vehicles/manifest.json',import.meta.url),'utf8')),templates=new Map(),reports=[];
+assert.equal(catalog.originalGeometry,true);assert.deepEqual(catalog.vehicles.map(c=>c.id),['hypercar','spyder','interceptor']);
+for(const metadata of catalog.vehicles){
+ const bytes=await readFile(new URL('../dist/assets/vehicles/'+metadata.id+'.glb',import.meta.url));const gltf=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
+ const template=prepareCar(gltf);template.userData.vehicle=metadata.id;templates.set(metadata.id,template);const car=cloneCar(template,'#245f78');car.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(car),size=bounds.getSize(new THREE.Vector3());
+ assert.equal(metadata.originalGeometry,true);assert.ok(size.z>4.4&&size.z<4.7);assert.ok(size.x>1.5&&size.x<2.3);assert.ok(size.y>1.05&&size.y<1.5);assert.equal(car.userData.wheelGroups.length,4);assert.ok(car.userData.paints.length);assert.ok(car.userData.brakes.length);
+ let triangles=0,glazing=0,frontLampZ=-Infinity,rearLampZ=Infinity;
+ car.traverse(o=>{if(!o.isMesh)return;triangles+=o.geometry.attributes.position.count/3;for(const value of o.geometry.attributes.position.array)assert.ok(Number.isFinite(value));const m=o.material,b=new THREE.Box3().setFromObject(o);if(m.name==='Glass glazing'){glazing++;assert.ok(m.transparent&&m.opacity>.1&&m.opacity<.7);assert.equal(m.depthWrite,false);}if(m.name==='Projector light')frontLampZ=Math.max(frontLampZ,b.max.z);if(m.name==='Brakelight red')rearLampZ=Math.min(rearLampZ,b.min.z);});
+ assert.equal(glazing,1);assert.ok(frontLampZ>1.9);assert.ok(rearLampZ< -1.9);
+ for(const group of car.userData.wheelGroups){const b=new THREE.Box3().setFromObject(group);assert.ok(Math.abs(b.min.y)<.003,'Tires must meet the ground');assert.ok((group.name.includes('Front')?group.position.z:-group.position.z)>1.3);group.traverse(o=>{if(o.isMesh)assert.notEqual(o.material.name,'Fixed caliper','Brake calipers stay fixed');});for(const spin of [Math.PI/3,Math.PI,19]){group.rotation.x=spin;car.updateMatrixWorld(true);assert.ok(Math.abs(b.getCenter(new THREE.Vector3()).y-new THREE.Box3().setFromObject(group).getCenter(new THREE.Vector3()).y)<.015,'Wheel pivot is eccentric');}group.rotation.x=0;}
+ const other=cloneCar(template,'#b72227');assert.notEqual(car.userData.paints[0],other.userData.paints[0]);assert.equal(other.userData.paints[0].color.getHexString(),'b72227');reports.push({id:metadata.id,dimensions:size.toArray().map(v=>+v.toFixed(3)),triangles,wheels:4});
+}
+console.log(JSON.stringify({originalVehicles:reports,groundedWheels:true,materialIsolation:true,gpuRendering:'not exercised'},null,2));
+const template=templates.get('hypercar');
 
 // Run the real scene update with only the GPU render call replaced.
 // This validates transforms and state integration, not browser visuals or FPS.
 function makeWorld(){
  const track=createTrack();
  const world=Object.assign(Object.create(World.prototype),{
-  track,race:new Race(track),template,contactTexture:new THREE.Texture(),
+  track,race:new Race(track),template,templates,vehicle:'hypercar',contactTexture:new THREE.Texture(),
   scene:new THREE.Scene(),camera:new THREE.PerspectiveCamera(61,1,.1,2400),
   sun:new THREE.DirectionalLight(),look:new THREE.Vector3(),time:0,carMeshes:[],
   renderCalls:0,
@@ -37,21 +39,10 @@ function makeWorld(){
 }
 const near=(actual,expected,message)=>assert.ok(Math.abs(actual-expected)<1e-6,message??`${actual} != ${expected}`);
 
-test('AC-14 decal UV coordinates survive FBX joins and runtime preparation',()=>{
- const raw=[],prepared=[];
- gltf.scene.traverse(o=>{if(o.isMesh&&/^Vinyl/.test(o.material.name))raw.push(o);});
- template.traverse(o=>{if(o.isMesh&&/^Vinyl/.test(o.material.name))prepared.push(o);});
- assert.equal(raw.length,2);assert.equal(prepared.length,2);
- for(const mesh of prepared){
-  const original=raw.find(o=>o.material.name===mesh.material.name),source=original.geometry.index?original.geometry.toNonIndexed():original.geometry;
-  const uv=mesh.geometry.getAttribute('uv');
-  assert.deepEqual(uv.array,source.getAttribute('uv').array,'Preparation must retain the decal texture coordinates');
-  const u=[],v=[];
-  for(let i=0;i<uv.count;i++){u.push(uv.getX(i));v.push(uv.getY(i));}
-  assert.ok(Math.max(...u)-Math.min(...u)>.25,'UVs must span the artwork, not the transparent origin');
-  assert.ok(Math.max(...v)-Math.min(...v)>.4);
-  assert.ok(u.every(Number.isFinite)&&v.every(Number.isFinite));
- }
+test('AC-15 each selected vehicle uses its own geometry and diversifies rivals',()=>{
+ const w=makeWorld();
+ for(const id of templates.keys()){w.setVehicle(id);w.update(1/60);assert.equal(w.carMeshes[0].userData.vehicle,id);assert.equal(w.carMeshes[0].userData.wheelGroups.length,4);assert.equal(new Set(w.carMeshes.slice(1).map(c=>c.userData.vehicle)).size,3);}
+ w.setVehicle('bad');assert.equal(w.vehicle,'interceptor');
 });
 
 test('AC-12 front wheel axles stay level at every spin and steering angle',()=>{
@@ -67,13 +58,12 @@ test('AC-12 front wheel axles stay level at every spin and steering angle',()=>{
  }
 });
 
-test('AC-11 changing player paint leaves rival paint and vinyl unchanged',()=>{
+test('AC-11 changing player paint leaves rival paint unchanged',()=>{
  const w=makeWorld(),rival=w.carMeshes[1];
  const rivals=rival.userData.paints.map(m=>m.color.getHexString());
  w.setPaint('#1c6274');w.update(1/60);
  for(const m of w.carMeshes[0].userData.paints)assert.equal(m.color.getHexString(),'1c6274');
  assert.deepEqual(rival.userData.paints.map(m=>m.color.getHexString()),rivals);
- w.carMeshes[0].traverse(o=>{if(o.isMesh&&o.material.name==='Vinyl graphic')assert.equal(o.material.color.getHexString(),'ffffff');});
 });
 
 test('AC-12 braking lights only that car and returns to normal when released',()=>{

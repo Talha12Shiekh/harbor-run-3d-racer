@@ -2,7 +2,7 @@ export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const wrap=(v,n)=>((v%n)+n)%n;
 export const angleDiff=(a,b)=>wrap(a-b+Math.PI,Math.PI*2)-Math.PI;
 export const STEP=1/120;
-export const PAINTS=['#c59626','#b72227','#dfd8c6','#28343d','#1c6274'];
+export const PAINTS=['#3446c7','#b72227','#dfd8c6','#28343d','#1c6274','#c59626'];
 export function createTrack(){
  const points=[[0,0],[0,180],[80,300],[250,330],[380,270],[440,100],[380,-100],[210,-220],[0,-240],[-100,-170],[-80,-80],[-20,-70]];
  const samples=[],N=780;
@@ -64,5 +64,5 @@ export class Race{
  get standings(){const progress=c=>{const last=this.track.gates[wrap(c.nextGate-1,8)],distance=wrap(c.s-last,this.track.length);return c.gates+clamp(distance/(this.track.length/8),0,.999);};return [this.player,...this.rivals].sort((a,b)=>{if(a.finish!==null||b.finish!==null)return (a.finish??Infinity)-(b.finish??Infinity);return progress(b)-progress(a);});}
  get position(){return this.standings.indexOf(this.player)+1;}
 }
-export function validateProfile(raw){const p={version:1,paint:PAINTS[0],quality:'high',volume:.55,records:{}};if(!raw||typeof raw!=='object')return p;if(PAINTS.includes(raw.paint))p.paint=raw.paint;if(['high','low'].includes(raw.quality))p.quality=raw.quality;if(Number.isFinite(raw.volume))p.volume=clamp(raw.volume,0,1);for(const key of ['lap','race'])if(Number.isFinite(raw.records?.[key])&&raw.records[key]>0)p.records[key]=raw.records[key];return p;}
+export function validateProfile(raw){const p={version:1,paint:PAINTS[0],quality:'high',volume:.55,vehicle:'hypercar',environment:'forest',records:{}};if(!raw||typeof raw!=='object')return p;if(PAINTS.includes(raw.paint))p.paint=raw.paint;if(['hypercar','spyder','interceptor'].includes(raw.vehicle))p.vehicle=raw.vehicle;if(['forest','alpine'].includes(raw.environment))p.environment=raw.environment;if(['high','low'].includes(raw.quality))p.quality=raw.quality;if(Number.isFinite(raw.volume))p.volume=clamp(raw.volume,0,1);for(const key of ['lap','race'])if(Number.isFinite(raw.records?.[key])&&raw.records[key]>0)p.records[key]=raw.records[key];return p;}
 export function updateRecords(profile,car){if(car.finish===null||car.gates<16)return profile;const lap=Math.min(...car.lapTimes);if(Number.isFinite(lap)&&lap>0)profile.records.lap=Math.min(profile.records.lap??Infinity,lap);profile.records.race=Math.min(profile.records.race??Infinity,car.finish);return profile;}

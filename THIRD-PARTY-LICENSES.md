@@ -1,45 +1,29 @@
-# Third party assets and licenses
+# Third party assets and original geometry
 
-## Mitsubishi Lancer Evolution IX
+## Original Blender models
 
-Base geometry by Benit Kibabu, originally authored in Autodesk Maya.
-Source: https://sketchfab.com/3d-models/mitsubishi-lancer-evolution-ix-ee88ad9414884bdabaf0658943ac339b
-License: CC BY 4.0, https://creativecommons.org/licenses/by/4.0/ . No endorsement is implied.
+The three vehicles in `dist/assets/vehicles` and thirteen scenery/road prototypes in `dist/assets/wilderness` were authored for Harbor Run from original Blender surface sections and primitives. Editable scenes and authoring scripts are in `assets-src`. No downloaded vehicle or scenery geometry is used by this release. The previous independently licensed sedan and city presentation can be recovered from earlier Git versions.
 
-Files: assets-src/upstream/lancer-evolution-ix.fbx, assets-src/tuner-sedan.blend, dist/assets/tuner-sedan.glb and tuner-sedan.json.
+The supplied Hot Pursuit footage informed visible proportions and scene composition. No extracted Need for Speed code, music, models, textures, tracks or video frames are distributed. Original police lettering and signs contain no copied game livery or manufacturer emblems. The reconstruction does not imply endorsement.
 
-Adaptations: scale and upper-body proportions, interior simplification, new PBR materials, red five-spoke wheel faces, stationary caliper accents, wheel pivots and original skull/claw vinyl. Full provenance, source checksum and retained license metadata are in assets-src/upstream. The source author describes some deviations from the real car.
+Original work includes driving, circuit, UI, procedural sound, vehicle/scenery geometry, conifer needle opacity/color maps, blended mountain biome maps, bark/concrete maps, debris, paint wear and contact shadows. Procedural material scripts are included. The preview renderer appends only this project's own Blender files.
 
-## Poly Haven textures
+## Poly Haven maps and daylight
 
-Files: dist/assets/asphalt.jpg, asphalt-normal.jpg, brick.jpg and brick-normal.jpg.
+Sources: https://polyhaven.com/a/asphalt_01 and https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky
 
-Sources: https://polyhaven.com/a/asphalt_01 and https://polyhaven.com/a/brick_wall_001
+License: CC0, https://polyhaven.com/license . Credit is voluntary.
 
-License: CC0, https://polyhaven.com/license . Photo texture color and normal maps at 1K resolution. Asphalt and brick repeat and material adjustment happen in the renderer. Credit is included voluntarily.
+Files: `dist/assets/asphalt.jpg`, `asphalt-normal.jpg`, `daylight.hdr`. `road-worn.jpg` modifies Asphalt 01 with original cracks and pockmarks. The 2K HDR supplies sky and material reflections. These maps are also packed into composed Blender previews where used.
+
+The retained `brick.jpg` and `brick-normal.jpg` came from https://polyhaven.com/a/brick_wall_001 under the same CC0 license. They are unused by the current wilderness runtime.
 
 ## Three.js 0.180.0
 
-Files: dist/vendor/build and dist/vendor/examples.
-
 Source: https://github.com/mrdoob/three.js
 
-License: MIT, complete text retained in dist/vendor/LICENSE.
+Files: `dist/vendor/build` and `dist/vendor/examples`.
 
-## Original work
+License: MIT; complete text is retained in `dist/vendor/LICENSE`.
 
-Harbor Run game logic, circuit design, Blender authored city geometry, generated material and foliage textures, interface, generated signs and synthesized sound were created for this project. No Need for Speed extracted code, music, vehicle models, textures, tracks or video footage are bundled. The independently authored vehicle base above is included under its stated license. Car photographs and the supplied screenshot informed proportions; their pixels and logos are not textures in the game. The supplied video was available only through a partial automated scene analysis, not full playback.
-
-## Poly Haven daylight environment
-
-File: dist/assets/daylight.hdr.
-
-Source: https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky
-
-License: CC0, https://polyhaven.com/license . The 2K HDR image supplies the sky and material reflections. Original asphalt and brick maps are also embedded in the Blender GLB exports. road-worn.jpg is a modified version of Asphalt 01 with generated cracks and pockmarks.
-
-Blender is an authoring tool and is not distributed in this source package. Editable scene and generated models are included.
-
-## Original vehicle vinyl
-
-assets-src/textures/sedan-vinyl.png is an original AI-generated transparent skull/claw graphic created for Harbor Run, not extracted game artwork. The authoring prompt is retained in assets-src/textures/sedan-vinyl-prompt.txt. The PNG is embedded in the runtime GLB and packed into the Blender scene.
+Blender is an authoring tool and is not redistributed. The source package contains editable scenes and exports, not a Blender installation.
