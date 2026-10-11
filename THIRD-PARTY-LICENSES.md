@@ -2,11 +2,11 @@
 
 ## Original Blender models
 
-The three vehicles in `dist/assets/vehicles` and thirteen scenery/road prototypes in `dist/assets/wilderness` were authored for Harbor Run from original Blender surface sections and primitives. Editable scenes and authoring scripts are in `assets-src`. No downloaded vehicle or scenery geometry is used by this release. The previous independently licensed sedan and city presentation can be recovered from earlier Git versions.
+The five vehicles in `dist/assets/vehicles` and fourteen scenery/road/lamp prototypes in `dist/assets/wilderness` were authored for Harbor Run from original Blender surface sections and primitives. Editable scenes and authoring scripts are in `assets-src`. No downloaded vehicle or scenery geometry is used by this release. The previous independently licensed sedan and city presentation can be recovered from earlier Git versions.
 
 The supplied Hot Pursuit footage informed visible proportions and scene composition. No extracted Need for Speed code, music, models, textures, tracks or video frames are distributed. Original police lettering and signs contain no copied game livery or manufacturer emblems. The reconstruction does not imply endorsement.
 
-Original work includes driving, circuit, UI, procedural sound, vehicle/scenery geometry, conifer needle opacity/color maps, blended mountain biome maps, bark/concrete maps, debris, paint wear and contact shadows. Procedural material scripts are included. The preview renderer appends only this project's own Blender files.
+Original work includes driving, circuit, UI, procedural sound, night sky, rendered menu imagery, vehicle/scenery geometry, conifer needle opacity/color maps, blended mountain biome maps, bark/concrete maps, debris, paint wear and contact shadows. Procedural material scripts are included. The preview renderer appends only this project's own Blender files.
 
 ## Poly Haven maps and daylight
 
@@ -27,3 +27,9 @@ Files: `dist/vendor/build` and `dist/vendor/examples`.
 License: MIT; complete text is retained in `dist/vendor/LICENSE`.
 
 Blender is an authoring tool and is not redistributed. The source package contains editable scenes and exports, not a Blender installation.
+
+## Barlow and Barlow Condensed
+
+Designed by Jeremy Tribby. Source distribution: Google Fonts, `ofl/barlow` and `ofl/barlowcondensed` in https://github.com/google/fonts.
+
+Files in `dist/assets/fonts`: Barlow Regular and SemiBold, Barlow Condensed Bold and ExtraBold Italic. SIL Open Font License 1.1. The complete license texts are retained beside the font files as `barlow-OFL.txt` and `barlowcondensed-OFL.txt`. Fonts are served locally.

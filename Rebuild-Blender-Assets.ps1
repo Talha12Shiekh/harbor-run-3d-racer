@@ -18,6 +18,12 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Vehicle build failed.' }
     & $BlenderPath --background --factory-startup --python assets-src/build_wilderness.py
     if ($LASTEXITCODE -ne 0) { throw 'Scenery build failed.' }
+    & $BlenderPath --background --factory-startup --python assets-src/build_night.py
+    if ($LASTEXITCODE -ne 0) { throw 'Night asset build failed.' }
+    if ($RenderVehicles) {
+        & $BlenderPath --background --factory-startup --python assets-src/render_ui.py
+        if ($LASTEXITCODE -ne 0) { throw 'Garage thumbnail render failed.' }
+    }
     if ($RenderScenes) {
         & $BlenderPath --background --factory-startup --python assets-src/render_wilderness.py
         if ($LASTEXITCODE -ne 0) { throw 'Scene render failed.' }

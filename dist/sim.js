@@ -1,3 +1,4 @@
+import {hasVehicle,hasSetting} from './catalog.js';
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const wrap=(v,n)=>((v%n)+n)%n;
 export const angleDiff=(a,b)=>wrap(a-b+Math.PI,Math.PI*2)-Math.PI;
@@ -64,5 +65,5 @@ export class Race{
  get standings(){const progress=c=>{const last=this.track.gates[wrap(c.nextGate-1,8)],distance=wrap(c.s-last,this.track.length);return c.gates+clamp(distance/(this.track.length/8),0,.999);};return [this.player,...this.rivals].sort((a,b)=>{if(a.finish!==null||b.finish!==null)return (a.finish??Infinity)-(b.finish??Infinity);return progress(b)-progress(a);});}
  get position(){return this.standings.indexOf(this.player)+1;}
 }
-export function validateProfile(raw){const p={version:1,paint:PAINTS[0],quality:'high',volume:.55,vehicle:'hypercar',environment:'forest',records:{}};if(!raw||typeof raw!=='object')return p;if(PAINTS.includes(raw.paint))p.paint=raw.paint;if(['hypercar','spyder','interceptor'].includes(raw.vehicle))p.vehicle=raw.vehicle;if(['forest','alpine'].includes(raw.environment))p.environment=raw.environment;if(['high','low'].includes(raw.quality))p.quality=raw.quality;if(Number.isFinite(raw.volume))p.volume=clamp(raw.volume,0,1);for(const key of ['lap','race'])if(Number.isFinite(raw.records?.[key])&&raw.records[key]>0)p.records[key]=raw.records[key];return p;}
+export function validateProfile(raw){const p={version:1,paint:PAINTS[0],quality:'high',volume:.55,vehicle:'hypercar',environment:'forest',onboardingVersion:0,records:{}};if(!raw||typeof raw!=='object')return p;if(PAINTS.includes(raw.paint))p.paint=raw.paint;if(hasVehicle(raw.vehicle))p.vehicle=raw.vehicle;if(hasSetting(raw.environment))p.environment=raw.environment;if(raw.onboardingVersion===1)p.onboardingVersion=1;if(['high','low'].includes(raw.quality))p.quality=raw.quality;if(Number.isFinite(raw.volume))p.volume=clamp(raw.volume,0,1);for(const key of ['lap','race'])if(Number.isFinite(raw.records?.[key])&&raw.records[key]>0)p.records[key]=raw.records[key];return p;}
 export function updateRecords(profile,car){if(car.finish===null||car.gates<16)return profile;const lap=Math.min(...car.lapTimes);if(Number.isFinite(lap)&&lap>0)profile.records.lap=Math.min(profile.records.lap??Infinity,lap);profile.records.race=Math.min(profile.records.race??Infinity,car.finish);return profile;}

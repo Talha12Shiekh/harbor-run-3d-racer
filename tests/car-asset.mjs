@@ -5,15 +5,16 @@ import * as THREE from 'three';
 import {GLTFLoader} from '../dist/vendor/examples/jsm/loaders/GLTFLoader.js';
 import {World,prepareCar,cloneCar} from '../dist/world.js';
 import {Race,createTrack,aiInput,STEP} from '../dist/sim.js';
+import {VEHICLES} from '../dist/catalog.js';
 globalThis.self=globalThis;
 // Geometry validation uses an image metadata stub. It does not test GPU texture upload.
 globalThis.createImageBitmap=async()=>({width:1024,height:1024,close(){}});
 const catalog=JSON.parse(await readFile(new URL('../dist/assets/vehicles/manifest.json',import.meta.url),'utf8')),templates=new Map(),reports=[];
-assert.equal(catalog.originalGeometry,true);assert.deepEqual(catalog.vehicles.map(c=>c.id),['hypercar','spyder','interceptor']);
+assert.equal(catalog.originalGeometry,true);assert.deepEqual(catalog.vehicles.map(c=>c.id),VEHICLES.map(v=>v.id));
 for(const metadata of catalog.vehicles){
  const bytes=await readFile(new URL('../dist/assets/vehicles/'+metadata.id+'.glb',import.meta.url));const gltf=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
- const template=prepareCar(gltf);template.userData.vehicle=metadata.id;templates.set(metadata.id,template);const car=cloneCar(template,'#245f78');car.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(car),size=bounds.getSize(new THREE.Vector3());
- assert.equal(metadata.originalGeometry,true);assert.ok(size.z>4.4&&size.z<4.7);assert.ok(size.x>1.5&&size.x<2.3);assert.ok(size.y>1.05&&size.y<1.5);assert.equal(car.userData.wheelGroups.length,4);assert.ok(car.userData.paints.length);assert.ok(car.userData.brakes.length);
+ const template=prepareCar(gltf,metadata);template.userData.vehicle=metadata.id;templates.set(metadata.id,template);const car=cloneCar(template,'#245f78');car.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(car),size=bounds.getSize(new THREE.Vector3());
+ assert.equal(metadata.originalGeometry,true);assert.ok(size.z>4.4&&size.z<4.7);assert.ok(size.x>1.5&&size.x<2.35);assert.ok(size.y>1.05&&size.y<1.55);assert.equal(car.userData.wheelGroups.length,4);assert.ok(car.userData.paints.length);assert.ok(car.userData.brakes.length);
  let triangles=0,glazing=0,frontLampZ=-Infinity,rearLampZ=Infinity;
  car.traverse(o=>{if(!o.isMesh)return;triangles+=o.geometry.attributes.position.count/3;for(const value of o.geometry.attributes.position.array)assert.ok(Number.isFinite(value));const m=o.material,b=new THREE.Box3().setFromObject(o);if(m.name==='Glass glazing'){glazing++;assert.ok(m.transparent&&m.opacity>.1&&m.opacity<.7);assert.equal(m.depthWrite,false);}if(m.name==='Projector light')frontLampZ=Math.max(frontLampZ,b.max.z);if(m.name==='Brakelight red')rearLampZ=Math.min(rearLampZ,b.min.z);});
  assert.equal(glazing,1);assert.ok(frontLampZ>1.9);assert.ok(rearLampZ< -1.9);
@@ -41,8 +42,8 @@ const near=(actual,expected,message)=>assert.ok(Math.abs(actual-expected)<1e-6,m
 
 test('AC-15 each selected vehicle uses its own geometry and diversifies rivals',()=>{
  const w=makeWorld();
- for(const id of templates.keys()){w.setVehicle(id);w.update(1/60);assert.equal(w.carMeshes[0].userData.vehicle,id);assert.equal(w.carMeshes[0].userData.wheelGroups.length,4);assert.equal(new Set(w.carMeshes.slice(1).map(c=>c.userData.vehicle)).size,3);}
- w.setVehicle('bad');assert.equal(w.vehicle,'interceptor');
+ for(const id of templates.keys()){w.setVehicle(id);w.update(1/60);assert.equal(w.carMeshes[0].userData.vehicle,id);assert.equal(w.carMeshes[0].userData.wheelGroups.length,4);assert.equal(new Set(w.carMeshes.slice(1).map(c=>c.userData.vehicle)).size,5);}
+ w.setVehicle('bad');assert.equal(w.vehicle,'muscle');
 });
 
 test('AC-12 front wheel axles stay level at every spin and steering angle',()=>{
@@ -95,7 +96,7 @@ test('AC-12 repeated restarts release unique resources and preserve shared car a
  try{
   for(let n=0;n<4;n++){
    const oldCars=[...w.carMeshes],oldShadows=[...w.contactShadows],owned=new Set(),counts=new Map();
-   for(const car of oldCars){for(const m of [...car.userData.paints,...car.userData.brakes])owned.add(m);owned.add(car.userData.flame.geometry);owned.add(car.userData.flame.material);}
+   for(const car of oldCars){for(const m of [...car.userData.paints,...car.userData.brakes,...car.userData.police])owned.add(m);owned.add(car.userData.flame.geometry);owned.add(car.userData.flame.material);}
    for(const shadow of oldShadows){owned.add(shadow.geometry);owned.add(shadow.material);}
    for(const resource of owned){counts.set(resource,0);resource.addEventListener('dispose',()=>counts.set(resource,counts.get(resource)+1));}
    w.race.restart('#dfd8c6');w.attachCars();w.update(1/60);
@@ -137,4 +138,32 @@ test('AC-3 AC-12 actual scene updates follow a complete legal race',()=>{
  assert.ok(w.renderCalls>1000);
  for(const mesh of w.carMeshes)assert.ok([...mesh.position.toArray(),...mesh.quaternion.toArray()].every(Number.isFinite));
  near(w.carMeshes[0].position.x,w.race.player.x);near(w.carMeshes[0].position.z,w.race.player.z);
+});
+
+// Cast against the exported painted hood. This catches the actual previous hidden lamp defect.
+test('AC-19 headlight housings remain above the hood after GLB preparation',()=>{
+ for(const id of ['hypercar','spyder','interceptor']){
+  const car=cloneCar(templates.get(id),'#3446c7');car.updateMatrixWorld(true);const paint=[],housings=[];
+  car.traverse(o=>{if(o.isMesh&&o.material.name==='Paint Pearl')paint.push(o);if(o.isMesh&&o.material.name.startsWith('Headlamp housing'))housings.push(o);});
+  assert.equal(housings.length,2);let tested=0,min=Infinity;const ray=new THREE.Raycaster(),p=new THREE.Vector3();
+  for(const o of housings){const points=o.geometry.attributes.position;for(let i=0;i<points.count;i+=47){p.fromBufferAttribute(points,i).applyMatrix4(o.matrixWorld);ray.set(new THREE.Vector3(p.x,2,p.z),new THREE.Vector3(0,-1,0));const hit=ray.intersectObjects(paint,false)[0];if(hit){min=Math.min(min,p.y-hit.point.y);tested++;}}}
+  assert.ok(tested>50,id+' lamp surfaces not sampled');assert.ok(min>.010,id+' headlight housing intersects hood: '+min);
+ }
+});
+
+test('AC-20 headlights illuminate ahead of the moving car and turn off in daylight',()=>{
+ const w=makeWorld();w.environment='night';w.race.player.heading=.9;w.update(1/60);w.scene.updateMatrixWorld(true);const car=w.carMeshes[0];
+ assert.equal(car.userData.headlights.length,2);
+ for(const light of car.userData.headlights){const origin=light.getWorldPosition(new THREE.Vector3()),target=light.target.getWorldPosition(new THREE.Vector3()),dir=target.sub(origin).normalize();assert.equal(light.intensity,1800);assert.ok(dir.x*Math.sin(.9)+dir.z*Math.cos(.9)>.95);assert.ok(dir.y<0);assert.ok(origin.y>w.race.player.y+.4);}
+ for(const m of car.userData.brakes)assert.equal(m.emissiveIntensity,.85);
+ w.environment='forest';w.update(1/60);for(const light of car.userData.headlights)assert.equal(light.intensity,0);
+});
+
+test('AC-22 six garage angles expose front, rear and both sides',()=>{
+ const w=makeWorld(),p=w.race.player;const positions=new Set();
+ for(const view of ['front','rear','left','right','angle','orbit']){w.setGarageView(view);w.update(1/60,false,true,true);positions.add(w.camera.position.toArray().map(v=>v.toFixed(2)).join(','));assert.ok(w.camera.position.toArray().every(Number.isFinite));}
+ assert.equal(positions.size,5); // Reduced motion orbit intentionally uses the same angled pose.
+ w.setGarageView('front');w.update(1/60,false,true);assert.ok((w.camera.position.x-p.x)*Math.sin(p.heading)+(w.camera.position.z-p.z)*Math.cos(p.heading)>7);
+ w.setGarageView('rear');w.update(1/60,false,true);assert.ok((w.camera.position.x-p.x)*Math.sin(p.heading)+(w.camera.position.z-p.z)*Math.cos(p.heading)<-7);
+ w.setGarageView('invalid');assert.equal(w.garageView,'orbit');
 });

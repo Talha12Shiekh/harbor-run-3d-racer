@@ -55,3 +55,21 @@ A shader-only pass would retain the city/sedan mismatch. More downloaded car/sce
 Primary dimension references inspected for proportions: Koenigsegg Agera technical specifications, Porsche 918 Spyder manufacturer newsroom and Bugatti Veyron manufacturer brochure. The video car identities are treated as visual families rather than claiming exact manufacturer/game CAD replicas. No manufacturer photograph pixels are bundled.
 
 Implementation evidence for the video direction: sixteen original GLB sets (three vehicles plus thirteen scenery/road assets), independently editable Blender prototypes and composed forest/alpine scenes. Roads and shoulders are exported original Blender geometry, preserving the simulation route. Foliage uses original procedural needle opacity maps with varied volumetric boughs; terrain color blends continuously. Manufacturer references inform approximate family proportions only; the delivered bodies are original reconstructions. No imported sedan/FBX remains in this source version.
+
+## After Hours reference and diagnosis, 2026-10-11
+
+The latest first screenshot shows broken white lamp outlines across the blue hood and a detached lower bar. Three triangle center probes on the old headlamp polygon found two centers 37.7 and 39.9 mm below the painted hood. The script sampled the curved deck only at five boundary points and filled them with one flat polygon. Tessellating the complete housing against the same deck function fixes the cause. A regression casts downward rays against the actual exported paint surface and checks that both housings stay above it. This improves all three existing bodies while retaining their accepted rear profiles.
+
+The second attachment shows a gold rally sedan with red wheels, four doors and a high wing. The new original Kestrel body uses those silhouette features with independent stripe graphics. A Vanguard coupe adds a genuinely different long hood and wide grille. All five bodies are authored without imported meshes. The actual game models supply UI thumbnail and location artwork through Blender rendering.
+
+The supplied MP4 was sampled again at 03:30 for twilight forest lighting, visible lane paint and tail lamps. Night is a third selectable presentation of the existing forest loop. Cool fill, warm roadside pools and directional headlights keep its road readable. It adds no new race progression rules. The game uses a fixed pool of four nearby road lights plus two player headlights, rather than one shadow light per pole.
+
+Reference links checked during this task:
+
+* [Koenigsegg CCX official photo gallery](https://www.koenigsegg.com/model/ccx), front lamp clusters, low canopy and rear cooling detail.
+* [Need for Speed Heat official page](https://www.ea.com/games/need-for-speed/need-for-speed-heat), day/night racing and garage media.
+* [EA Heat PC manual](https://eaassets-a.akamaihd.net/eahelp/manuals/nfs-heat-pc-ukanz.pdf), garage, car customization, menu and day/night selection hierarchy.
+* [EA Hot Pursuit Remastered manual](https://eaassets-a.akamaihd.net/eahelp/manuals/nfs-hp-remastered-switch-en.pdf), driving screen and car selection context.
+* [EA Unbound car list](https://www.ea.com/en/games/need-for-speed/need-for-speed-unbound/news/car-list), multiple body families including rally sedans and muscle cars. The older Hot Pursuit car list URL returned 404, so it was not used as verified roster evidence.
+
+The photographed cars, commercial menus and gameplay frames are reference evidence only. They are not bundled as shipped menu artwork. Barlow and Barlow Condensed are distributed with their actual OFL license texts. The authoring renderer has a broad area fill to approximate the runtime hemisphere fill; it remains a Blender preview, not browser proof.

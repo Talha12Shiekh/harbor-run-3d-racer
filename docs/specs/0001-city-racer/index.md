@@ -1,6 +1,6 @@
 # 0001 City racer
 
-**Status**: Implemented, 1.4.0; browser verification limits are in BUILD-REPORT.md
+**Status**: Implemented, 1.5.0; browser verification limits are in BUILD-REPORT.md
 **Date**: 2026-10-11
 **Authorized by**: User, Accept and build, then proceed with all remaining steps.
 
@@ -125,3 +125,34 @@ This is an original reconstruction of visible forms and atmosphere. Authoring ra
 
 ### Implemented assets and evidence
 Three original vehicles and thirteen scenery/road exports replace the prior imported sedan and city. Original terrain and road/shoulder geometry are authored in Blender against the unchanged legal circuit. Garage selectors persist validated choices; rivals/traffic use different bodies. BUILD-REPORT.md records measurements, 12 driving tests, 9 vehicle scene tests, both clear placement sets, image decoding and 18 vehicle/2 world authoring renders. README.md records local Blender/Windows rebuilding. Exact model/map matching and GPU FPS remain explicit limits.
+
+## Front geometry, midnight and garage, authorized 2026-10-11
+
+### Requirements
+AC-19: Correct hidden lamp housings and the detached front splitter. Each of the five original Blender cars has visible front/rear lamps, integrated bumper detail, proper glass, panel seams and grounded wheels. Provide front, rear, both sides and two angled renders.
+AC-20: Add Midnight Run to the setting selector. Use forest geometry with a dark blue sky, cool moonlight, warm roadside lamp pools, player headlights, luminous rear lamps and visible lane markings. Returning to daytime restores daytime lights and sky.
+AC-21: Add a four door rally sedan and a long hood muscle coupe, with different body, cabin, grille, lamp, wing and wheel designs. All five cars can be chosen and repainted; selection persists. Rivals and traffic use varied bodies.
+AC-22: Upgrade title, first visit driving briefing, garage, pause and results presentation. Use local licensed display/body fonts and imagery rendered from the actual original Blender assets. The garage has car thumbnails, scene cards, description, type information and camera angle buttons. All existing race controls, settings and records remain accessible.
+AC-23: Verify geometry, night switching, lamps, selections, onboarding state and race regressions. Publish the same private Site and replace the same source ZIP, including the Blender scenes and rebuild scripts. Separate authoring render checks from browser GPU verification.
+
+### Decision and value sources
+Fix in place, retaining the simulation, original Blender surface workflow and shared renderer. Direct replacement of the game engine or downloaded car meshes would add risk without addressing the measured lamp problem. The existing headlight housing triangles sink up to 40 mm beneath the curved deck. New housings subdivide and sample the same deck function; lens and LED detail is placed above that surface. A solid shaped splitter follows the body nose. The accepted rear proportions remain while adding seams, grille depth and lamp detail.
+
+The supplied gold sedan image defines the rally silhouette, four doors, red wheels and rear wing. Original contrasting stripe graphics replace the pictured decals. Official Koenigsegg front/rear/side photos guide the existing hypercar. EA Heat media, manual and the supplied MP4 at 03:30 guide the night atmosphere and garage hierarchy. Official EA car listings establish the variety of sedan, muscle, open and exotic car families. These are visual references, not copied meshes, branding or menu assets.
+
+Vehicle names, descriptions, body classes and default paints come from dist/catalog.js. The five IDs are hypercar, spyder, interceptor, rally and muscle. Profile validation uses that catalog and allows forest, alpine and night. Existing records and finishes are preserved. Car physics remains common to all models; no invented performance ratings are displayed.
+
+Night reuses the forest terrain and road with explicit theme mapping. A new original Blender lamp prototype is instanced beside the road. A fixed small pool of nearby spotlights supplies actual warm light without one shadow map per roadside lamp. Two car attached player headlights point forward and toward the road, using each car's exported headlight positions. Night sky/reflections use an original procedural equirectangular texture and PMREM. Lighting and fog values live in world.js. Lamp intensity is derived from selected theme; brake intensity from the unchanged braking state. Owned lights and cloned materials are released when switching cars.
+
+Title uses an original Blender midnight road render as its background, Harbor Run branding and one Enter Garage action. A first visit optional briefing shows accelerate, corner/brake, nitrous and checkpoint instructions; Continue and Skip enter the same garage and save onboardingVersion 1. Returning profiles skip the briefing; a garage briefing button reopens it. Title appears at startup. Enter and gamepad Start advance the active onboarding screen before they start a race. Native focus and dialog controls remain.
+
+Garage uses the existing amber/cyan palette, local Barlow Condensed display font and Barlow body font under OFL. A left briefing panel has race facts, labelled body/setting selects, thumbnail car choices, three scene cards, paint row and Start Circuit. The actual 3D car occupies the right. Six camera controls use front, rear, left, right, angled front and automatic orbit presets. Scene card images and five car thumbnails are generated from the included Blender assets; they depict real selectable content. Pause/results use an image header, updated typography and the real recorded times. No career or upgrade mechanics are implied.
+
+### Build plan
+- [x] AC-19, AC-21: Correct existing fronts, author two distinct bodies and inspect six views per car.
+- [x] AC-20: Author roadside lamp and original sky, integrate headlights and reversible night lighting.
+- [x] AC-21, AC-22: Integrate catalog, persistent choices, cinematic title/briefing and garage camera controls.
+- [x] AC-19, AC-20, AC-23: Run geometry, surface clearance, scene ownership, profile and driving checks, publish and replace the source package.
+
+### Verification limits
+Blender renders show authored geometry and composition. They do not prove browser shading, performance or controller hardware behavior. Use supported browser preview if available; otherwise record that limit and publish after the available checks.

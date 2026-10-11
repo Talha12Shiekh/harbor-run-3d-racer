@@ -8,7 +8,7 @@ import {World} from '../dist/world.js';
 globalThis.self=globalThis;
 globalThis.createImageBitmap=async()=>({width:1024,height:1024,close(){}});
 const manifest=JSON.parse(await readFile(new URL('../dist/assets/wilderness/manifest.json',import.meta.url))),kit=new Map(),reports=[];
-assert.equal(manifest.originalGeometry,true);assert.equal(manifest.assets.length,13);
+assert.equal(manifest.originalGeometry,true);assert.equal(manifest.assets.length,14);
 for(const a of manifest.assets){
  assert.equal(a.originalGeometry,true);const bytes=await readFile(new URL('../dist/assets/wilderness/'+a.file,import.meta.url));const gltf=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
  const parts=assetParts(gltf.scene),bounds=new THREE.Box3();let triangles=0;
@@ -17,10 +17,10 @@ for(const a of manifest.assets){
  assert.equal(triangles,a.triangles);kit.set(a.name,{...a,parts});reports.push({name:a.name,parts:parts.length,triangles});
 }
 const track=createTrack(),themes=[];
-for(const theme of ['forest','alpine']){
+for(const theme of ['forest','alpine','night']){
  const placements=wildernessPlacements(track,manifest,theme);assert.deepEqual(placements,wildernessPlacements(track,manifest,theme));assert.ok(placements.length>700);
  for(const p of placements){for(const key of ['x','y','z','heading','scale'])assert.ok(Number.isFinite(p[key]));assert.ok(footprintClear(track,kit.get(p.name),p),'Road obstructed by '+p.name);}
- assert.ok(placements.some(p=>p.name===(theme==='alpine'?'spruce-snow':'redwood')));assert.equal(placements.some(p=>p.name==='waterfall'),theme==='forest');
+ assert.ok(placements.some(p=>p.name===(theme==='alpine'?'spruce-snow':'redwood')));assert.equal(placements.some(p=>p.name==='street-lamp'),theme==='night');assert.equal(placements.some(p=>p.name==='waterfall'),theme!=='alpine');
  for(const p of track.samples)assert.ok(groundHeight(manifest,p.x,p.z)<p.y-.1,'Terrain enters drivable road');
  const root=new THREE.Group(),installed=installWilderness(root,track,manifest,kit,theme);assert.ok(installed.draws<35);
  root.traverse(o=>{if(!o.isInstancedMesh)return;assert.ok(Number.isFinite(o.boundingSphere.radius));for(const v of o.instanceMatrix.array)assert.ok(Number.isFinite(v));if(o.material.alphaTest)assert.ok(o.customDepthMaterial);});
@@ -32,7 +32,7 @@ const legacy=validateProfile({paint:'#c59626',quality:'low',volume:.3,records:{l
 assert.equal(validateProfile({vehicle:'spyder',environment:'alpine'}).vehicle,'spyder');assert.equal(validateProfile({vehicle:'interceptor',environment:'alpine'}).environment,'alpine');
 // Exercise the actual switching path without a GPU or real text rasterization.
 globalThis.document={createElement(){return {width:512,height:128,getContext(){return {fillRect(){},strokeRect(){},fillText(){}};}};}};
-const world=Object.assign(Object.create(World.prototype),{track,manifest,kit,scene:new THREE.Scene(),textures:Array.from({length:8},()=>new THREE.Texture()),sun:new THREE.DirectionalLight(),hemi:new THREE.HemisphereLight()});world.scene.fog=new THREE.FogExp2();
-for(const theme of ['forest','alpine','forest']){const old=world.environmentRoot;world.setEnvironment(theme);assert.equal(world.worldInfo.theme,theme);assert.equal(world.scene.children.length,1);if(old){assert.equal(old.parent,null);assert.equal(old.children.length,0);}}
+const world=Object.assign(Object.create(World.prototype),{track,manifest,kit,scene:new THREE.Scene(),textures:Array.from({length:8},()=>new THREE.Texture()),sun:new THREE.DirectionalLight(),hemi:new THREE.HemisphereLight(),daySky:new THREE.Texture(),nightSky:new THREE.Texture(),envTarget:{texture:new THREE.Texture()},nightTarget:{texture:new THREE.Texture()}});world.scene.fog=new THREE.FogExp2();
+for(const theme of ['forest','night','alpine','night','forest']){const old=world.environmentRoot;world.setEnvironment(theme);assert.equal(world.worldInfo.theme,theme);assert.equal(world.scene.background,theme==='night'?world.nightSky:world.daySky);assert.equal(world.scene.environment,theme==='night'?world.nightTarget.texture:world.envTarget.texture);assert.equal(world.sun.intensity,theme==='night'?.9:theme==='alpine'?2.5:2.1);assert.equal(world.roadLights.length,4);for(const l of world.roadLights)assert.equal(l.visible,theme==='night');if(theme==='night')assert.ok(world.lampLocations.length>25);assert.equal(world.scene.children.length,9);if(old){assert.equal(old.parent,null);assert.equal(old.children.length,0);}}
 world.setEnvironment('invalid');assert.equal(world.environment,'forest');releaseEnvironment(world.environmentRoot);
-console.log(JSON.stringify({assets:reports,themes,clearDrivingCorridor:true,deterministic:true,profileMigration:true,actualThemeSwitches:3,gpuRendering:'not exercised'},null,2));
+console.log(JSON.stringify({assets:reports,themes,clearDrivingCorridor:true,deterministic:true,profileMigration:true,actualThemeSwitches:5,gpuRendering:'not exercised'},null,2));

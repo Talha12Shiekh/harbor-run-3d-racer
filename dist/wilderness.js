@@ -37,14 +37,15 @@ export function wildernessPlacements(track,manifest,theme='forest'){
  for(let s=18;s<track.length;s+=42){const side=random()>.5?1:-1;add(random()>.5?'rock-face':'boulder',s,side,23+random()*10,.7+random()*.5,random()*Math.PI*2);}
  const poles=[];for(let s=0;s<track.length;s+=72){const p=add('power-pole',s,-1,16,1);if(p)poles.push(p);}
  for(let i=0;i<poles.length;i++){const a=poles[i],b=poles[(i+1)%poles.length],length=Math.hypot(b.x-a.x,b.z-a.z),p={name:'power-line',...a,heading:Math.atan2(b.x-a.x,b.z-a.z),scaleX:1,scaleY:1,scaleZ:length/72};p.name='power-line';if(footprintClear(track,assets.get(p.name),p))placements.push(p);}
- if(theme==='forest')add('waterfall',track.length*.23,-1,72,1.4,track.at(track.length*.23).heading+Math.PI*.4);
+ if(theme!=='alpine')add('waterfall',track.length*.23,-1,72,1.4,track.at(track.length*.23).heading+Math.PI*.4);
+ if(theme==='night')for(let s=0;s<track.length;s+=58){const side=(Math.round(s/58)%2)?-1:1;add('street-lamp',s,side,15.2,1,track.at(s).heading+(side<0?Math.PI:0));}
  return placements;
 }
 export function installWilderness(parent,track,manifest,kit,theme='forest'){
  const placements=wildernessPlacements(track,manifest,theme),groups=new Map();let draws=0,triangles=0;
  for(const p of placements){if(!groups.has(p.name))groups.set(p.name,[]);groups.get(p.name).push(p);}
  for(const [name,list] of groups){for(const part of kit.get(name).parts){const mesh=new THREE.InstancedMesh(part.geometry,part.material,list.length),q=new THREE.Quaternion(),m=new THREE.Matrix4();list.forEach((p,i)=>{q.setFromAxisAngle(new THREE.Vector3(0,1,0),p.heading);m.compose(new THREE.Vector3(p.x,p.y,p.z),q,new THREE.Vector3(p.scaleX??p.scale,p.scaleY??p.scale,p.scaleZ??p.scale));mesh.setMatrixAt(i,m);});mesh.name='Original Blender '+name;mesh.userData.sharedAsset=true;mesh.castShadow=name!=='power-line';mesh.receiveShadow=true;if(part.material.alphaTest)mesh.customDepthMaterial=new THREE.MeshDepthMaterial({depthPacking:THREE.RGBADepthPacking,map:part.material.map,alphaTest:.42,side:THREE.DoubleSide});mesh.computeBoundingSphere();parent.add(mesh);draws++;triangles+=(part.geometry.index?.count??part.geometry.attributes.position.count)/3*list.length;}}
- for(const name of ['terrain-'+theme,'road-'+theme])for(const part of kit.get(name).parts){const m=new THREE.Mesh(part.geometry,part.material);m.name='Original Blender '+name;m.userData.sharedAsset=true;m.receiveShadow=true;parent.add(m);draws++;triangles+=(part.geometry.index?.count??part.geometry.attributes.position.count)/3;}
+ for(const name of ['terrain-'+(theme==='night'?'forest':theme),'road-'+(theme==='night'?'forest':theme)])for(const part of kit.get(name).parts){const m=new THREE.Mesh(part.geometry,part.material);m.name='Original Blender '+name;m.userData.sharedAsset=true;m.receiveShadow=true;parent.add(m);draws++;triangles+=(part.geometry.index?.count??part.geometry.attributes.position.count)/3;}
  return {placements,draws,triangles,theme};
 }
 export function releaseEnvironment(root){
