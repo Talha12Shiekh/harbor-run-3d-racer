@@ -67,8 +67,15 @@ test('AC-31 actual cockpit has a clear forward view and visible wheel and dials 
  }
 });
 test('AC-31 rear hold restores body/glazing and returns to a moving animated driver rig',()=>{
+ const projected=makeWorld();projected.setDrivingView('cockpit');
+ for(const id of templates.keys())for(const heading of [0,Math.PI/2,Math.PI,Math.PI*1.5])for(const steer of [-.7,.7]){
+  projected.setVehicle(id);Object.assign(projected.race.player,{heading,steer,speed:32});projected.update(1/60);projected.scene.updateMatrixWorld(true);projected.camera.updateMatrixWorld(true);
+  const wheel=projected.carMeshes[0].userData.cockpit.userData.steering,marker=wheel.children.find(m=>m.material.name==='Cockpit amber needle');
+  const center=wheel.getWorldPosition(new THREE.Vector3()).project(projected.camera),top=new THREE.Box3().setFromObject(marker).getCenter(new THREE.Vector3()).project(projected.camera);
+  assert.equal(Math.sign(top.x-center.x),-Math.sign(steer),'The wheel must turn toward the same screen side as the steering input');
+ }
  const w=makeWorld();w.setDrivingView('cockpit');w.race.player.steer=.7;w.race.player.speed=32;w.update(1/60);let rig=w.carMeshes[0].userData.cockpit;
- near(rig.userData.steering.rotation.z,wheelSteering(w.race.player)*3.2);const speed=rig.userData.speed.rotation.z;w.race.player.speed=52;w.update(1/60);assert.ok(rig.userData.speed.rotation.z>speed);
+ near(rig.userData.steering.rotation.z,-wheelSteering(w.race.player)*3.2);const speed=rig.userData.speed.rotation.z;w.race.player.speed=52;w.update(1/60);assert.ok(rig.userData.speed.rotation.z>speed);
  w.update(1/60,true);assert.equal(w.drivingView,'cockpit');assert.equal(rig.visible,false);assert.ok(w.carMeshes[0].userData.cabinMeshes.every(m=>m.visible));w.update(1/60,false);assert.equal(rig.visible,true);
  const car=w.race.player,normal=cameraPose(car,'cockpit',-.72,false,false),still=cameraPose(car,'cockpit',-.72,false,true);assert.notDeepEqual(normal.look,still.look);
  w.race.restart();w.attachCars();w.update(1/60);const next=w.carMeshes[0].userData.cockpit;assert.notEqual(next,rig);assert.equal(next.userData.steering.children[0].geometry,rig.userData.steering.children[0].geometry);assert.notEqual(next.userData.steering,rig.userData.steering);assert.equal(next.visible,true);

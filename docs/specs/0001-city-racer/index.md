@@ -246,7 +246,7 @@ Chase retains its accepted rear pose. Wide uses an 11.5 metre rear distance and 
 | rally | -.35, 1.24, -.32 | .19 | 1.04 |
 | muscle | -.35, 1.13, -.25 | .10 | 1.01 |
 
-Seat positions may be tuned against the real exported surfaces and authored previews to eliminate obstruction. The kit shares geometry/materials and only appears on the player in cabin mode. Original cabin leather, glazing and a separate painted roof triangle group temporarily hide, then restore in exterior/rear views. The roof split was required by actual forward ray checks; exterior GLBs, silhouette and triangle totals are unchanged. Close windshield trim follows the seat eye, and the open spyder omits its header. Wheel rotation derives from actual steering angle. Speed/RPM needle rotation derives from speed and gear. This adds no extra render pass or reflected mirror camera.
+Seat positions may be tuned against the real exported surfaces and authored previews to eliminate obstruction. The kit shares geometry/materials and only appears on the player in cabin mode. Original cabin leather, glazing and a separate painted roof triangle group temporarily hide, then restore in exterior/rear views. The roof split was required by actual forward ray checks; exterior GLBs, silhouette and triangle totals are unchanged. Close windshield trim follows the seat eye, and the open spyder omits its header. Wheel rotation derives from actual steering angle, with reversed Z sign for the forward-facing driver camera. Its projected top marker must move toward the same screen side as the steering input. Speed/RPM needle rotation derives from speed and gear. This adds no extra render pass or reflected mirror camera.
 
 | Action | Produced value | Source |
 | --- | --- | --- |

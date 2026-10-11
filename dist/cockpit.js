@@ -15,7 +15,7 @@ export function prepareCockpit(gltf){
 export function createCockpit(template,vehicle){const rig=template.clone(true),seat=SEATS[vehicle]??SEATS.hypercar;rig.position.y=seat.lift;rig.visible=false;rig.userData.steering=rig.getObjectByName('CockpitSteering');rig.userData.speed=rig.getObjectByName('SpeedNeedle');rig.userData.rpm=rig.getObjectByName('RpmNeedle');for(const name of ['CockpitFrame','CockpitHeader']){const frame=rig.getObjectByName(name);frame.position.y+=seat.eye[1]-SEATS.hypercar.eye[1]-seat.lift;frame.position.z+=seat.eye[2]-SEATS.hypercar.eye[2];if(name==='CockpitHeader')frame.visible=vehicle!=='spyder';}return rig;}
 export function updateCockpit(rig,car,visible){
  rig.visible=visible;if(!visible)return;
- rig.userData.steering.rotation.z=wheelSteering(car)*3.2;
+ rig.userData.steering.rotation.z=-wheelSteering(car)*3.2;
  const speed=Math.abs(car.speed),rpm=speed<1?1100:1100+(speed%12)/12*4700;
  rig.userData.speed.rotation.z=-2.3+Math.min(speed*3.6/300,1)*4.6;
  rig.userData.rpm.rotation.z=-2.3+Math.min(rpm/7000,1)*4.6;
