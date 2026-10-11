@@ -1,43 +1,35 @@
-# Harbor Run build report
+# Harbor Run 1.3.0 verification report
 
-Date: 2026-10-11, vehicle upgrade 1.2.1.
+Date: 2026-10-11.
 
-The user played the first published circuit and reported that it was playable, but the environment looked too simple. The supplied comparisons guided this upgrade. This report distinguishes the new asset and simulation checks from live GPU validation.
+## Outcome and root cause
 
-## Passed
+The earlier upgrade chose a low coupe, while the latest reference is a four-door tuned sedan. This was an incorrect geometry choice. The new release adapts Benit Kibabu's independently authored Lancer Evolution IX under CC BY 4.0, retaining its source FBX, attribution, license metadata and checksum. No extracted Need for Speed assets are included.
 
-`npm test`: 12 tests passed, zero failures. Coverage includes route continuity, driving bounds, nitrous and Speedbreaker, road boundaries, car separation, legal checkpoint crossings, reset, pause, validated records and a complete race with three rivals plus four traffic cars.
+The adaptation preserves sculpted panels, handles, window frames and interior. It adds physical materials, red five-spoke wheel faces, stationary caliper accents and original skull/claw vinyl. Rally gold is the new-profile default; existing validated paint choices and records remain.
 
-`npm run check`: ten JavaScript modules parse, local imports and static UI bindings resolve, required assets exist and static hosting points at dist.
+Two authoring failures were reproduced and fixed: replacing material slots reset face assignments, and joining differently named UV layers put decals at the transparent texture origin. Face indices are now retained and UV layer names unified. A regression check validates meaningful decal coordinates and exact preservation through the game preparation function.
 
-`npm run check:model`: the new Harbor Coupe GLB parses with the game's preparation code. It contains 32 merged meshes, 111,824 triangles and four wheel groups, with finite coordinates. Dimensions are 2.202 metres wide including mirrors, 1.362 metres tall and 4.6 metres long. The body is approximately 1.93 metres wide. Tire bottoms are within 3 mm of the ground plane. Wheel spin preserves pivot centers, axle direction is correct, calipers stay fixed, paint is isolated between cars, vinyl remains untinted and rear lamps stay red. The front lamps face positive Z and the rear lamps face negative Z. Glazing opacity is 0.36 and the authored material settings survive preparation.
+## Completed checks
 
-`npm run check:city`: all ten Blender GLBs parse with finite positions, normals and UVs, expected mesh and triangle counts, and bounds matching their exported metadata. Deterministic placement produces 295 scenery instances using 63 material batches and 1,084,340 instanced triangles. Nearby building bounds, including façade overhangs, remain at least 13.61 metres from the road center. The playable road is 19 metres wide. Cutout foliage uses matching alpha tested shadow materials. The HDR loader decodes the 2048 by 1024 daylight environment.
+- `npm test`: 12 driving tests pass, covering checkpoints, reset, pause, collisions, resources, records and complete legal races.
+- `npm run check:model`: 9 asset and actual scene tests pass, plus model assertions. Coverage includes UV preservation, pivots, wheel steering/spin, calipers, paint isolation, brake lamps, boost, contact shadows, restart disposal, cameras, skids and complete race updates. The GPU render call is replaced.
+- Prepared sedan: 24 meshes, 239,849 triangles, dimensions 2.030 by 1.463 by 4.600 metres, glazing opacity 0.44. Tires meet the ground within 3 mm. Front is positive Z. Four restarts release owned resources once while preserving shared assets.
+- `npm run check`: ten modules parse, imports and UI bindings resolve, assets exist and hosting is configured.
+- `npm run check:city`: ten city GLBs parse with finite geometry and UVs. Placement remains 295 instances, 63 batches and 1,084,340 instanced triangles. Minimum building-corner distance to road center is 13.61 metres, beyond the 9.5 metre half-width. The 2048 by 1024 HDR decodes.
+- Pillow decodes 29 external textures and 47 embedded runtime GLB images. Original vinyl is 2172 by 724 RGBA with alpha range 0 to 255.
+- Six Blender 4.5.3 Cycles renders are inspected: direct front/rear, both sides and two three-quarter views. They verify authoring, not game GPU rendering. See assets-src/sedan-six-views.jpg.
 
-Pillow decoded 25 source and runtime texture files and 60 embedded GLB images. The foliage atlas contains 85.3 percent transparent pixels and 14.7 percent opaque leaf pixels. Model tests use a bitmap metadata stub in Node, so the separate Pillow checks validate image decoding; neither proves GPU upload.
+## Video and scene presentation
 
-Actual Blender 4.5.3 LTS authored and exported the kit and saved its editable scene. A 1280 by 720 Cycles verification render was inspected. A preview placement rotation error was corrected, and the revised render has no floating roof equipment. This image is an asset authoring render, not a game screenshot. Its camera and lighting differ from the game.
+The earlier supplied MP4 was decoded locally: 1280 by 720, approximately 59.94 FPS, duration 965.293 seconds. 97 frames sampled across its full duration were inspected in seven contact sheets. This is not a claim of manually reviewing every frame. The new duplicate ending in (1).mp4 did not reach the workspace and was not used.
 
-## Not exercised
+The footage shows forest free drive, a mountainous interception event and a police pursuit, with menus and results. Its low chase viewpoint, readable lamps, coherent reflections and worn surfaces inform this city presentation. The latest sedan screenshot defines the car; the video's supercars do not replace it.
 
-Updated browser rendering, GPU texture upload, measured FPS and actual controller hardware were not tested. The managed environment lacks the browser control skill required by the Sites preview workflow. No substitute browser was started. The user playtested the first release; that does not verify this upgrade. Successful deployment proves publication, not reference similarity or photorealism.
+The camera is lower and closer with gentler speed-dependent FOV. Ambient/direct fill is reduced, shadow bias tightened and fog neutralized. An original periodic roughness map and modest road clearcoat vary surface sheen. Road reflections come from the daylight environment; planar or screen-space reflection of nearby cars/buildings is not implemented. City layouts and driving rules remain.
 
-## Manual verification
+## Limits and manual checks
 
-Reload the published game and inspect the five architecture styles, leafy trees, industrial pipe bridges, daylight sky, worn surfaces, car reflections and tire contact. Compare high and reduced graphics on the intended laptop and measure frame rate. Drive both laps, check controls, pause and resume, reset, rear view, finish and retained records. Confirm that foliage shadows have gaps and there are no missing textures or street obstructions.
+The managed workspace lacks the browser-control capability required by Sites preview. Updated browser visuals, GPU texture upload, transparency sorting, FPS and physical gamepads were not tested. Node uses a bitmap metadata stub. Decoded images and Blender renders do not prove GPU appearance. Publication proves delivery, not exact reference similarity or AAA quality.
 
-Police pursuits, career, upgrades, more cars and touch driving remain outside this circuit upgrade. Editable Blender sources, deterministic texture generation, export scripts and asset credits are included.
-
-## Vehicle authoring verification
-
-Blender 4.5.3 LTS exported the new coupe and saved the editable scene. Two 1200 by 800 Cycles renders were inspected. The first pass exposed opaque glass and lenses; the Blender Alpha input and exported blend mode were corrected. Rear wing supports were grounded on the trunk and the interior was finished with dark trim and seats. Both embedded images (64 by 64 carbon weave and 2048 by 512 RGBA vinyl) decode with Pillow. Glass, lamp lenses and vinyl have exported BLEND alpha modes. The source textures and render images also decode.
-
-These renders verify the authored asset, not its appearance in the running game. Updated browser rendering, transparency sorting, subjective reference similarity and FPS remain manual checks. Inspect rear lamp visibility, paint choices, vinyl, cabin, wheel rotation and front steering after reloading the published game. Existing 12 simulation tests and city checks passed again. One vehicle model is used for all cars; distinct traffic bodies and selectable cars are later work.
-
-## Vehicle runtime verification
-
-Eight additional checks call the real World scene methods with the authored GLB and real Race simulation. Only the GPU render call is replaced. The checks cover steering across wheel spin phases, paint isolation, brake lamp activation and release, positions and contact shadows, boost visibility, repeated race restarts, chase and rear cameras, reduced motion garage camera, skid transforms and a complete legal race.
-
-Two checks initially failed. The default XYZ rotation order tilted a steered front wheel axle as the wheel spun. The wheel now uses YXZ so steering turns the axle while spin leaves it level. Restarting previously removed scene objects without disposing the resources unique to each car. It now releases cloned paint and brake materials, flame geometry and material, and contact shadow geometry and material. Each restart releases 48 old resources exactly once and preserves shared car geometry, materials and textures. Four repeated restarts retain eight cars and eight shadows with no old scene objects.
-
-All eight runtime checks pass after these corrections. The existing twelve driving tests, static source check, model geometry checks and city asset checks also pass. Browser appearance, GPU memory measurements and FPS remain unverified. The restart checks validate disposal events and ownership, not a GPU memory profile.
+Reload, select Rally gold, inspect front/rear/side presentation, glass, wing, lamps and vinyl, then drive both laps. Check rear view, wheel motion, braking, boost, pause/restart and saved records. Compare high/reduced graphics and measure FPS on the target computer. Police modes, career, more bodies, terrain routes and touch driving remain outside this correction.

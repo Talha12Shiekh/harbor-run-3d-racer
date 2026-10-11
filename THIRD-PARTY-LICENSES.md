@@ -1,16 +1,14 @@
 # Third party assets and licenses
 
-## Concept Car
+## Mitsubishi Lancer Evolution IX
 
-File: dist/assets/car.glb, retained baseline, not loaded by the current game.
+Base geometry by Benit Kibabu, originally authored in Autodesk Maya.
+Source: https://sketchfab.com/3d-models/mitsubishi-lancer-evolution-ix-ee88ad9414884bdabaf0658943ac339b
+License: CC BY 4.0, https://creativecommons.org/licenses/by/4.0/ . No endorsement is implied.
 
-Source: https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept
+Files: assets-src/upstream/lancer-evolution-ix.fbx, assets-src/tuner-sedan.blend, dist/assets/tuner-sedan.glb and tuner-sedan.json.
 
-Creator: Unity Fan, with optimized glTF sample preparation by Khronos Group.
-
-License: Creative Commons Attribution 4.0 International (CC BY 4.0), https://creativecommons.org/licenses/by/4.0/ . Upstream license is retained at dist/assets/car-license.md. That license excludes logos and associated trademarks. No endorsement is implied.
-
-Changes at render time: normalize to 4.6 metres, merge meshes by material, separate wheel groups, recolor paint, simplify glass material, hide emblem meshes and remove unnamed panel and license plate artwork maps. The bundled GLB is the original upstream binary; render transformations are in dist/world.js.
+Adaptations: scale and upper-body proportions, interior simplification, new PBR materials, red five-spoke wheel faces, stationary caliper accents, wheel pivots and original skull/claw vinyl. Full provenance, source checksum and retained license metadata are in assets-src/upstream. The source author describes some deviations from the real car.
 
 ## Poly Haven textures
 
@@ -30,7 +28,7 @@ License: MIT, complete text retained in dist/vendor/LICENSE.
 
 ## Original work
 
-Harbor Run game logic, circuit design, Blender authored city geometry, generated material and foliage textures, interface, generated signs and synthesized sound were created for this project. No Need for Speed code, music, branded vehicle models, textures, tracks or video footage are bundled. Reference videos and screenshots were studied for camera composition and gameplay context only.
+Harbor Run game logic, circuit design, Blender authored city geometry, generated material and foliage textures, interface, generated signs and synthesized sound were created for this project. No Need for Speed extracted code, music, vehicle models, textures, tracks or video footage are bundled. The independently authored vehicle base above is included under its stated license. Car photographs and the supplied screenshot informed proportions; their pixels and logos are not textures in the game. The supplied video was available only through a partial automated scene analysis, not full playback.
 
 ## Poly Haven daylight environment
 
@@ -42,8 +40,6 @@ License: CC0, https://polyhaven.com/license . The 2K HDR image supplies the sky 
 
 Blender is an authoring tool and is not distributed in this source package. Editable scene and generated models are included.
 
-## Harbor Coupe
+## Original vehicle vinyl
 
-Files: dist/assets/tuner-coupe.glb, tuner-coupe.json and assets-src/tuner-coupe.blend.
-
-The coupe geometry, original vinyl and carbon weave texture were authored for Harbor Run using the included Blender and Pillow scripts. Reference photographs informed proportions and detail; their pixels, branding and vinyl artwork are not bundled. The coupe does not use geometry from the retained Concept Car.
+assets-src/textures/sedan-vinyl.png is an original AI-generated transparent skull/claw graphic created for Harbor Run, not extracted game artwork. The authoring prompt is retained in assets-src/textures/sedan-vinyl-prompt.txt. The PNG is embedded in the runtime GLB and packed into the Blender scene.

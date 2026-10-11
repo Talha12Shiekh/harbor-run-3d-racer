@@ -1,0 +1,52 @@
+{
+  "name": "Mitsubishi Lancer Evolution IX",
+  "uid": "ee88ad9414884bdabaf0658943ac339b",
+  "user": {
+    "uid": "b8adedac01bf4847938ef024a0b20258",
+    "username": "benitkibabu",
+    "displayName": "Benit Kibabu",
+    "account": "basic",
+    "profileUrl": "https://sketchfab.com/benitkibabu",
+    "avatar": {
+      "uid": "4626fc3e054a423eaf7d1fa9ae02ab05",
+      "uri": "https://api.sketchfab.com/v3/avatars/4626fc3e054a423eaf7d1fa9ae02ab05",
+      "images": [
+        {
+          "width": 32,
+          "height": 32,
+          "size": 629,
+          "url": "https://media.sketchfab.com/avatars/4626fc3e054a423eaf7d1fa9ae02ab05/98f0f9cebe324602a86c927a9a4984ee.jpeg"
+        },
+        {
+          "width": 48,
+          "height": 48,
+          "size": 1059,
+          "url": "https://media.sketchfab.com/avatars/4626fc3e054a423eaf7d1fa9ae02ab05/3f021147cb564ee8894468e347abc726.jpeg"
+        },
+        {
+          "width": 90,
+          "height": 90,
+          "size": 2801,
+          "url": "https://media.sketchfab.com/avatars/4626fc3e054a423eaf7d1fa9ae02ab05/94d8ecce27724839aa5b6d93c94f76eb.jpeg"
+        },
+        {
+          "width": 100,
+          "height": 100,
+          "size": 3191,
+          "url": "https://media.sketchfab.com/avatars/4626fc3e054a423eaf7d1fa9ae02ab05/0b852f0aed754926ac0e9ced83b6efa5.jpeg"
+        }
+      ]
+    },
+    "uri": "https://api.sketchfab.com/v3/users/b8adedac01bf4847938ef024a0b20258"
+  },
+  "license": {
+    "uri": "https://api.sketchfab.com/v3/licenses/322a749bcfa841b29dff1e8a1bb74b0b",
+    "label": "CC Attribution",
+    "fullName": "Creative Commons Attribution",
+    "requirements": "Author must be credited. Commercial use is allowed.",
+    "url": "http://creativecommons.org/licenses/by/4.0/",
+    "slug": "by"
+  },
+  "description": "A high resolution - High Detailed 3D model of the Mitsubishi Lancer Evolution IX made and designed in Autodesk Maya.\n\nThe model does resemble real life model to some extents where as some part are not. You can use this model for high detail simulation games that are close to resemble driving games such as Forza or Drive Club.\n\nAny additional information, please feel free to ask and If you have any request, i'm here to listen to them.\n\nObject Format: \n.fbx",
+  "viewerUrl": "https://sketchfab.com/3d-models/mitsubishi-lancer-evolution-ix-ee88ad9414884bdabaf0658943ac339b"
+}

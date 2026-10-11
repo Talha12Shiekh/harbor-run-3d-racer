@@ -2,7 +2,7 @@ export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const wrap=(v,n)=>((v%n)+n)%n;
 export const angleDiff=(a,b)=>wrap(a-b+Math.PI,Math.PI*2)-Math.PI;
 export const STEP=1/120;
-export const PAINTS=['#b72227','#dfd8c6','#28343d','#1c6274'];
+export const PAINTS=['#c59626','#b72227','#dfd8c6','#28343d','#1c6274'];
 export function createTrack(){
  const points=[[0,0],[0,180],[80,300],[250,330],[380,270],[440,100],[380,-100],[210,-220],[0,-240],[-100,-170],[-80,-80],[-20,-70]];
  const samples=[],N=780;

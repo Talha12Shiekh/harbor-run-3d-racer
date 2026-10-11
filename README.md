@@ -11,7 +11,7 @@ cd dist
 python3 -m http.server 8080
 ```
 
-Open http://localhost:8080 in a desktop browser with WebGL and hardware acceleration. Opening index.html directly with a file URL does not support the module and asset loading workflow. The first load is approximately 27 MB. There are no runtime CDN requests.
+Open http://localhost:8080 in a desktop browser with WebGL and hardware acceleration. Opening index.html directly with a file URL does not support the module and asset loading workflow. The first load is approximately 32 MB. There are no runtime CDN requests.
 
 Use the game menu to start, choose paint, change graphics or sound, and view credits. Reduced graphics lowers resolution and disables shadows. No online account or backend is used. Best race, best lap, paint, graphics and sound volume are saved in browser localStorage when it is available.
 
@@ -63,11 +63,11 @@ npm run check:model
 npm run check:city
 ```
 
-The model check includes eight scene integration tests for wheel steering and spin, paint, brake lamps, boost, cameras, skid transforms, restarts and a complete race. It stubs image bitmap metadata and the GPU render call for Node. It does not test GPU texture upload or browser visuals. See BUILD-REPORT.md for exact verification and remaining limits.
+The model check includes nine asset and scene integration tests for wheel steering and spin, paint, brake lamps, boost, cameras, skid transforms, restarts and a complete race. It stubs image bitmap metadata and the GPU render call for Node. It does not test GPU texture upload or browser visuals. See BUILD-REPORT.md for exact verification and remaining limits.
 
 ## Scope and limitations
 
-This updated release contains one original circuit and one Blender authored street coupe reused with different paint for racers and traffic. It is not a full commercial game recreation. Police pursuits, career, additional vehicle models, upgrades and touch driving remain later work. GPU visual quality, actual gamepad hardware and frame rate have not been verified in a real browser in this environment. Geometry and simulation checks passed.
+This updated release contains one original circuit and one detailed sedan adapted in Blender reused with different paint for racers and traffic. It is not a full commercial game recreation. Police pursuits, career, additional vehicle models, upgrades and touch driving remain later work. GPU visual quality, actual gamepad hardware and frame rate have not been verified in a real browser in this environment. Geometry and simulation checks passed.
 
 All editable code and required assets are included. See THIRD-PARTY-LICENSES.md and upstream license files before redistribution. The hosting configuration identifies the existing private Site; change or remove it before publishing under a different project.
 
@@ -79,6 +79,7 @@ Blender 4.5.3 LTS generated these assets. To regenerate, install Blender and Pyt
 
 ```sh
 python3 assets-src/make_textures.py
+python3 assets-src/make_road_roughness.py
 blender --background --factory-startup --python assets-src/build_city.py
 ```
 
@@ -86,11 +87,16 @@ Add `-- --render` to the Blender command to render the verification street. `ass
 
 ## Vehicle authoring
 
-The live game loads `dist/assets/tuner-coupe.glb`. Its editable Blender source is `assets-src/tuner-coupe.blend`. The model has curved body panels and wheel arches, separate glass and interior, five spoke wheels with tire detail, projector lamps, red rear lamps, grille fins, side skirts, a rear diffuser, twin exhausts and a rear wing. Original red and black vinyl remains distinct from selectable paint. Calipers stay fixed while wheels rotate.
+The game loads `dist/assets/tuner-sedan.glb`. Its editable scene is `assets-src/tuner-sedan.blend`. The four-door base was authored by Benit Kibabu and licensed CC BY 4.0. Its source FBX, license metadata, attribution and checksum are in `assets-src/upstream`.
 
 ```sh
-python3 assets-src/make_car_vinyl.py
 blender --background --factory-startup --python assets-src/build_car.py
 ```
 
-Add `-- --render` for the front and rear asset renders. These use Blender Cycles, not the game renderer. Vehicle measurements and wheel naming are included in `dist/assets/tuner-coupe.json`. All racers and traffic share this model; there is no vehicle selection catalog. The earlier Concept Car GLB is retained as a credited baseline asset, but the game no longer loads it.
+Add `-- --render` for direct front, direct rear, both sides and front/rear three-quarter Cycles renders. They are authoring previews, not screenshots from the game. `tuner-sedan.json` records measurements, triangles and wheel pivots. All racers and traffic share the sedan; there is no vehicle catalog.
+
+The preparation script retains sculpted body panels, four doors, handles, window frames, angular lamps and interior. It assigns separate paint, glass, tire, rim, lamp and trim surfaces, creates red five-spoke wheel faces and projects original skull/claw artwork. Glass and clear lenses are translucent. Wheels use grounded independent pivots; calipers remain fixed. Rally gold is available as the first paint choice and becomes the default for new profiles. Existing paint and records are preserved.
+
+`assets-src/textures/sedan-vinyl.png` is an original ImageGen texture with transparency. Its complete generation prompt is in `sedan-vinyl-prompt.txt`; rebuilding geometry uses that included PNG. Retired vehicle binaries are available through previous Git versions instead of inflating this release.
+
+The latest supplied sedan screenshot guides the body; front, side and rear photographs and the supplied Hot Pursuit video guide proportions and presentation. These external pixels and video are not bundled. Research and its limits are documented in `docs/specs/0001-city-racer/rationale.md`.

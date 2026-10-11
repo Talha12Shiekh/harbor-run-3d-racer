@@ -8,7 +8,7 @@ import {Race,createTrack,aiInput,STEP} from '../dist/sim.js';
 globalThis.self=globalThis;
 // Geometry validation uses an image metadata stub. It does not test GPU texture upload.
 globalThis.createImageBitmap=async()=>({width:1024,height:1024,close(){}});
-const b=await readFile(new URL('../dist/assets/tuner-coupe.glb',import.meta.url));const gltf=await new GLTFLoader().parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'');
+const b=await readFile(new URL('../dist/assets/tuner-sedan.glb',import.meta.url));const gltf=await new GLTFLoader().parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'');
 const template=prepareCar(gltf),car=cloneCar(template,'#245f78');car.updateMatrixWorld(true);const size=new THREE.Box3().setFromObject(car).getSize(new THREE.Vector3());assert.ok(size.z>4.4&&size.z<4.7);assert.ok(size.x>1.5&&size.x<2.3);assert.ok(size.y>1.2&&size.y<1.5);assert.equal(car.userData.wheelGroups.length,4);assert.ok(car.userData.paints.length>0);assert.ok(car.userData.brakes.length>0);let meshes=0,triangles=0;car.traverse(o=>{if(o.isMesh){meshes++;triangles+=o.geometry.attributes.position.count/3;for(const n of o.geometry.attributes.position.array)assert.ok(Number.isFinite(n));}});for(const w of car.userData.wheelGroups){const s=new THREE.Box3().setFromObject(w).getSize(new THREE.Vector3());assert.ok(s.y>.2&&s.z>.2);assert.ok(Math.abs(new THREE.Box3().setFromObject(w).min.y)<.003,'Tires must meet the ground');}
 console.log(JSON.stringify({dimensionsMetres:size.toArray().map(x=>+x.toFixed(3)),mergedMeshes:meshes,triangles,wheels:4,finiteGeometry:true,gpuRendering:'not exercised'},null,2));
 
@@ -36,6 +36,23 @@ function makeWorld(){
  return world;
 }
 const near=(actual,expected,message)=>assert.ok(Math.abs(actual-expected)<1e-6,message??`${actual} != ${expected}`);
+
+test('AC-14 decal UV coordinates survive FBX joins and runtime preparation',()=>{
+ const raw=[],prepared=[];
+ gltf.scene.traverse(o=>{if(o.isMesh&&/^Vinyl/.test(o.material.name))raw.push(o);});
+ template.traverse(o=>{if(o.isMesh&&/^Vinyl/.test(o.material.name))prepared.push(o);});
+ assert.equal(raw.length,2);assert.equal(prepared.length,2);
+ for(const mesh of prepared){
+  const original=raw.find(o=>o.material.name===mesh.material.name),source=original.geometry.index?original.geometry.toNonIndexed():original.geometry;
+  const uv=mesh.geometry.getAttribute('uv');
+  assert.deepEqual(uv.array,source.getAttribute('uv').array,'Preparation must retain the decal texture coordinates');
+  const u=[],v=[];
+  for(let i=0;i<uv.count;i++){u.push(uv.getX(i));v.push(uv.getY(i));}
+  assert.ok(Math.max(...u)-Math.min(...u)>.25,'UVs must span the artwork, not the transparent origin');
+  assert.ok(Math.max(...v)-Math.min(...v)>.4);
+  assert.ok(u.every(Number.isFinite)&&v.every(Number.isFinite));
+ }
+});
 
 test('AC-12 front wheel axles stay level at every spin and steering angle',()=>{
  const w=makeWorld();

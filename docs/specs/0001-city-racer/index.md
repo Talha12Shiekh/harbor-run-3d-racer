@@ -34,7 +34,7 @@ Menu composition, HUD and visuals follow design.md. Audio is synthesized engine,
 - [x] AC-6: Publish and package editable source with credits.
 
 ## Consequences
-This first release is a circuit. Police pursuits, career, vehicle upgrades, additional cars and touch driving remain later work. It is not a reproduction of branded cars, music or original game assets. GPU rendering, controller hardware and frame rate need real browser verification when supported tooling is available.
+This first release is a circuit. Police pursuits, career, vehicle upgrades, additional cars and touch driving remain later work. It contains an independently authored, licensed sedan model. It does not bundle original game code, music or extracted game assets. GPU rendering, controller hardware and frame rate need real browser verification when supported tooling is available.
 
 
 ## Visual upgrade, authorized 2026-10-11
@@ -62,29 +62,34 @@ Reuse the existing detailed car and gameplay. Keep assets local, reusable and li
 See rationale.md for screenshot evidence and alternatives.
 
 
-## Vehicle upgrade, authorized by screenshot feedback 2026-10-11
+## Sedan correction, authorized by screenshot feedback 2026-10-11
 
 ### Summary
-Replace the bulbous concept car with an original tuned street coupe authored in Blender. The supplied pictures define the direction: road car proportions, sculpted bumpers, visible lamps, detailed wheels, a rear wing and vinyl graphics. The renderer and race remain.
+Replace the incorrectly chosen low coupe with a detailed four-door rally sedan. Use the latest gold sedan attachment for the car silhouette and front, side and rear photographs for panel and lamp detail. Retain the working city circuit and wheel contract.
 
 ### Requirements
 AC-10: A smooth Blender body with open wheel arches, glazing, interior, headlights, red rear lamps, five spoke wheels, bumper vents, seams, skirts, rear diffuser and wing replaces the concept car.
 AC-11: Existing paint choices remain. Original black and red vinyl, controlled paint reflections, translucent glass and separate rubber, metal and carbon materials distinguish surfaces. Wing and rear lamps are readable from the chase camera.
 AC-12: Four grounded wheel groups spin and steer correctly. Front points toward positive Z. Braking changes rear lamp intensity. Race state, collision dimensions, circuit and controls remain unchanged.
 AC-13: Deliver editable Blender scene, script, GLB metadata, asset renders and updated source through the same Site and source file identity. Record geometry and image checks separately from GPU playtesting.
-
-Runtime follow through in 1.2.1: eight automated scene integration checks cover AC-11 and AC-12, camera behavior from AC-4, and a complete race from AC-3. They reproduced and protected fixes for wheel rotation order and cleanup of unique car resources on restart. Shared assets remain reusable. GPU appearance and performance criteria remain open for manual verification.
+AC-14: The vehicle has four doors, a taller sedan cabin, angular front lamp housings and defined trunk. Projected side and hood vinyl retain nonzero texture coordinates through export and game preparation. Provide direct front, direct rear, both sides and two three-quarter authoring renders.
 
 ### Decision and value sources
-Create assets-src/build_car.py and export dist/assets/tuner-coupe.glb. Longitudinal body sections, wheel arch curves and separate cabin panels produce the geometry. Target dimensions are approximately 4.6 metres long and 1.9 metres wide, with a 1.35 metre cabin and 0.34 metre tire radius. The first attachment shows the existing game; the remaining pictures inform lamps, body kit, spokes, wing and vinyl composition. Original vinyl comes from a deterministic Pillow script with no copied logos or artwork.
+Adapt Benit Kibabu's independently authored Mitsubishi Lancer Evolution IX base under CC BY 4.0. Retain the source FBX, attribution and source checksum. assets-src/build_car.py prepares the mesh in Blender 4.5.3, assigns PBR materials (physical surface properties), simplifies hidden interior, creates red five-spoke wheel faces and projects original skull/claw art. dist/assets/tuner-sedan.glb is the runtime model; tuner-sedan.json records dimensions and pivots.
 
-Material names define paint, glass, carbon, rubber, rims and lamps. Wheel groups retain WheelFrontL, WheelFrontR, WheelRearL and WheelRearR. The loader preserves authored surface settings. Paint comes from profile and car colors; brake state and wheel angle come from sim.js. Ground height comes from tire vertices. The local daylight environment supplies reflections.
+The original Maya UV layer is renamed UVMap before joining decals. Material face indices are retained when slots are replaced. Without these steps the decal samples transparent pixels and front doors take a trim material. Test the actual exported GLB with prepareCar, including UV preservation.
+
+Target dimensions are 4.6 metres long, approximately 2.03 metres wide including mirrors and 1.46 metres tall. Tire radius comes from source tire bounds, approximately 0.346 metres. WheelFrontL, WheelFrontR, WheelRearL and WheelRearR remain the runtime contract. Ground comes from tire vertices. Paint and brake state come from sim.js; original vinyl remains untinted. Rally gold becomes the new-profile default; existing validated paint choices and records remain intact.
+
+Camera and lighting parameters are explicit in world.js. Lower the chase camera to 2.4 metres, use a 7.1 to 8.1 metre following distance and reduce speed FOV growth. Reduce direct and ambient fill while retaining the daylight environment, soft shadows and neutral distance fog. Add a periodic original scalar roughness map and modest road clearcoat for varied damp-surface sheen; reflections come from the existing daylight environment. The supplied video is a different game and setting; its camera and lighting inform this city presentation without replacing the route.
 
 ### Build plan
-- [x] AC-10, AC-12: Export the body and wheels and establish loading through the existing preparation contract.
-- [x] AC-10, AC-11: Complete lamps, cabin, wheels, seams, body kit and vinyl; inspect front and rear Blender renders.
-- [x] AC-12, AC-13: Verify dimensions, contact, pivots, direction, paint and brake isolation, normals, UVs, images and driving regressions.
-AC-13 delivery: push checked source, publish the existing private Site and replace the existing source ZIP. Actual game appearance and frame rate remain manual checks until supported browser tooling is available.
+- [x] AC-10, AC-14: Select the sedan base from the latest screenshot and front, side and rear references; retain author credit and license.
+- [x] AC-10, AC-11, AC-14: Adapt Blender geometry, materials, red wheels and original vinyl; review six views.
+- [x] AC-4, AC-12, AC-14: Integrate the new asset; verify wheel motion, material and UV preservation, camera behavior and legal race progress.
+- [x] AC-13: Prepare checked source, publish the existing private Site and replace the existing source ZIP. The delivery operations record their exact version and deployment identities.
 
 ### Consequences
-One new car model is shared by racers and traffic with paint variations. It does not reproduce a branded vehicle exactly. Material tuning alone retains concept proportions, so geometry replacement is selected. Profiles and races require no data migration. Reverting the vehicle asset path restores the earlier model.
+All racers and traffic share one detailed model. More triangles improve panel and cabin detail but add rendering cost; browser FPS must be measured. Blender renders verify the authored asset and exported geometry, not the game GPU. Subjective similarity, transparency sorting and controller hardware remain manual checks. Reverting this release commit restores the old asset path and source. Profiles require no migration.
+
+Reasoning and sources: see rationale.md.
