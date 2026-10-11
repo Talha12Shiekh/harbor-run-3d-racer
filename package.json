@@ -1,1 +1,12 @@
-{"name":"harbor-run","version":"1.0.0","private":true,"type":"module","scripts":{"test":"node --test tests/driving.test.mjs","check":"node scripts/check.mjs","check:model":"node --loader ./tests/three-resolver.mjs tests/car-asset.mjs"}}
+{
+  "name": "harbor-run",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/driving.test.mjs",
+    "check": "node scripts/check.mjs",
+    "check:model": "node --loader ./tests/three-resolver.mjs tests/car-asset.mjs",
+    "check:city": "node --loader ./tests/three-resolver.mjs tests/city-assets.mjs"
+  }
+}

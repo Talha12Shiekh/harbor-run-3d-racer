@@ -1,0 +1,224 @@
+{
+  "blender": "4.5.3 LTS",
+  "seed": 7814,
+  "assets": [
+    {
+      "kind": "building",
+      "width": 18,
+      "depth": 17,
+      "height": 25,
+      "name": "masonry",
+      "file": "masonry.glb",
+      "meshes": 11,
+      "triangles": 7660,
+      "bounds": {
+        "min": [
+          -9.300000190734863,
+          -0.04999995231628418,
+          -8.800000190734863
+        ],
+        "max": [
+          10.450000762939453,
+          24.400001525878906,
+          10.899999618530273
+        ]
+      }
+    },
+    {
+      "kind": "building",
+      "width": 23,
+      "depth": 19,
+      "height": 33,
+      "name": "limestone",
+      "file": "limestone.glb",
+      "meshes": 10,
+      "triangles": 14408,
+      "bounds": {
+        "min": [
+          -11.800000190734863,
+          -0.04999995231628418,
+          -9.800000190734863
+        ],
+        "max": [
+          12.950000762939453,
+          32.400001525878906,
+          11.899999618530273
+        ]
+      }
+    },
+    {
+      "kind": "building",
+      "width": 25,
+      "depth": 23,
+      "height": 55,
+      "name": "office",
+      "file": "office.glb",
+      "meshes": 9,
+      "triangles": 3652,
+      "bounds": {
+        "min": [
+          -12.625,
+          -0.04999995231628418,
+          -11.625
+        ],
+        "max": [
+          12.625,
+          54.400001525878906,
+          13.899999618530273
+        ]
+      }
+    },
+    {
+      "kind": "building",
+      "width": 19,
+      "depth": 19,
+      "height": 78,
+      "name": "tower",
+      "file": "tower.glb",
+      "meshes": 10,
+      "triangles": 3548,
+      "bounds": {
+        "min": [
+          -9.625,
+          -0.04999995231628418,
+          -9.625
+        ],
+        "max": [
+          9.625,
+          78.0,
+          11.899999618530273
+        ]
+      }
+    },
+    {
+      "kind": "building",
+      "width": 31,
+      "depth": 22,
+      "height": 15,
+      "name": "warehouse",
+      "file": "warehouse.glb",
+      "meshes": 9,
+      "triangles": 1952,
+      "bounds": {
+        "min": [
+          -15.625,
+          0.0,
+          -11.125
+        ],
+        "max": [
+          15.625,
+          14.399999618530273,
+          11.649999618530273
+        ]
+      }
+    },
+    {
+      "kind": "tree",
+      "height": 9.3,
+      "spread": 3.4,
+      "name": "tree-broad",
+      "file": "tree-broad.glb",
+      "meshes": 2,
+      "triangles": 2052,
+      "bounds": {
+        "min": [
+          -4.406192779541016,
+          -0.003846466541290283,
+          -4.957365989685059
+        ],
+        "max": [
+          5.081667423248291,
+          10.107368469238281,
+          4.657861709594727
+        ]
+      }
+    },
+    {
+      "kind": "tree",
+      "height": 12.5,
+      "spread": 2.8,
+      "name": "tree-tall",
+      "file": "tree-tall.glb",
+      "meshes": 2,
+      "triangles": 2052,
+      "bounds": {
+        "min": [
+          -4.338085651397705,
+          -0.002861920977011323,
+          -3.709540367126465
+        ],
+        "max": [
+          3.609689235687256,
+          12.959696769714355,
+          4.265639781951904
+        ]
+      }
+    },
+    {
+      "kind": "bridge",
+      "width": 27,
+      "depth": 4,
+      "height": 9.5,
+      "name": "pipe-bridge",
+      "file": "pipe-bridge.glb",
+      "meshes": 4,
+      "triangles": 2872,
+      "bounds": {
+        "min": [
+          -13.0,
+          0.0,
+          -2.0
+        ],
+        "max": [
+          13.0,
+          9.064229965209961,
+          2.0
+        ]
+      }
+    },
+    {
+      "kind": "prop",
+      "width": 6.4,
+      "depth": 2.4,
+      "height": 2.9,
+      "name": "street-props",
+      "file": "street-props.glb",
+      "meshes": 4,
+      "triangles": 280,
+      "bounds": {
+        "min": [
+          -3.200000047683716,
+          0.0,
+          -1.2000000476837158
+        ],
+        "max": [
+          3.200000286102295,
+          2.875,
+          1.2000000476837158
+        ]
+      }
+    },
+    {
+      "kind": "prop",
+      "width": 0.7,
+      "depth": 0.4,
+      "height": 1.04,
+      "name": "hydrant",
+      "file": "hydrant.glb",
+      "meshes": 2,
+      "triangles": 124,
+      "bounds": {
+        "min": [
+          -0.30000001192092896,
+          0.0,
+          -0.1899999976158142
+        ],
+        "max": [
+          0.30000001192092896,
+          1.0399999618530273,
+          0.1899999976158142
+        ]
+      }
+    }
+  ]
+}

@@ -30,4 +30,14 @@ License: MIT, complete text retained in dist/vendor/LICENSE.
 
 ## Original work
 
-Harbor Run game logic, circuit design, procedural city, interface, generated signs and synthesized sound were created for this project. No Need for Speed code, music, branded vehicle models, textures, tracks or video footage are bundled. Reference videos and screenshots were studied for camera composition and gameplay context only.
+Harbor Run game logic, circuit design, Blender authored city geometry, generated material and foliage textures, interface, generated signs and synthesized sound were created for this project. No Need for Speed code, music, branded vehicle models, textures, tracks or video footage are bundled. Reference videos and screenshots were studied for camera composition and gameplay context only.
+
+## Poly Haven daylight environment
+
+File: dist/assets/daylight.hdr.
+
+Source: https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky
+
+License: CC0, https://polyhaven.com/license . The 2K HDR image supplies the sky and material reflections. Original asphalt and brick maps are also embedded in the Blender GLB exports. road-worn.jpg is a modified version of Asphalt 01 with generated cracks and pockmarks.
+
+Blender is an authoring tool and is not distributed in this source package. Editable scene and generated models are included.
