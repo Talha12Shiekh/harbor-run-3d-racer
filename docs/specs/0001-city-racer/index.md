@@ -1,6 +1,6 @@
 # 0001 City racer
 
-**Status**: Implemented, 1.5.0; browser verification limits are in BUILD-REPORT.md
+**Status**: Implemented, 1.6.0; browser verification limits are in BUILD-REPORT.md
 **Date**: 2026-10-11
 **Authorized by**: User, Accept and build, then proceed with all remaining steps.
 
@@ -156,3 +156,67 @@ Garage uses the existing amber/cyan palette, local Barlow Condensed display font
 
 ### Verification limits
 Blender renders show authored geometry and composition. They do not prove browser shading, performance or controller hardware behavior. Use supported browser preview if available; otherwise record that limit and publish after the available checks.
+
+## Steering, handling, pursuit and performance, authorized 2026-10-11
+
+### Summary
+Correct the reversed driver controls, give each existing car its own driving character, and add a selectable police pursuit. Retain the Circuit event and existing scenery. Measure the available CPU and camera workload before tuning, and provide real frame measurements in the browser for the remaining hardware check.
+
+### Requirements
+AC-24: Left arrows, A and left gamepad input turn toward the left of the normal chase view. Right inputs turn right. Opposed keys cancel, the stick dead zone remains, focus loss clears input, and reversing behaves like steered wheels. The existing rear view is a view behind the driver, not a different steering mode.
+AC-25: All five selectable cars have distinct acceleration, speed limits, braking, steering response, grip and handbrake behavior. The selected model and physical setup agree on restart. The garage describes the actual setup without suggesting licensed manufacturer specifications.
+AC-26: A garage event selector offers Circuit and Pursuit. Pursuit has traffic and up to three actual interceptor opponents with road following, player interception, collisions, flashing lights and a synthesized siren. Officers physically drive; only a newly activated reinforcement is spawned. Active officers do not teleport to catch the player.
+AC-27: Pursuit can end in escape or bust. Show heat, active patrol count, contact distance, escape progress and bust progress from the real state. Pause freezes the event. Restart resets it. Recovering the player stays at their current route segment and clears escape progress without moving police. Pursuit results and best escape times are separate from Circuit records.
+AC-28: Measure the scenery submitted by camera frustums (the visible camera volume) and scene CPU cost before and after. Divide scenery instances into spatial batches while retaining every authored placement and shared asset ownership. Add Auto graphics with bounded adaptive resolution and an optional FPS/draw/triangle overlay based on actual browser frames and renderer counters. Keep High and Reduced options.
+AC-29: Check controls, all car setups, three environments, event selection, pursuit outcomes, persistence, ownership and Circuit regressions. Publish the same Site with its current audience and replace the same checked source ZIP. Record unavailable browser appearance, hardware controller and GPU FPS checks explicitly.
+
+### Decision
+Fix in place using the existing Three.js scene and fixed 120 Hz simulation. Keep Circuit as the default event and add Pursuit alongside it. No new packages, remote game services or commercial assets are required. Extend the existing approved spec in place. The build approach is an end to end slice from controls and simulation through the garage/HUD, followed by measured scene tuning and delivery.
+
+### Feature design and value sources
+Driver controls translate screen directions into the established world heading convention. The car faces +Z with Y up. A chase camera behind it has screen right toward local negative X, so left driver input increases heading and right decreases it. AI continues to use geometric heading differences. Front wheel steering uses the same steering angle as the simulation.
+
+`dist/handling.js` owns frozen arcade setups. Speeds are metres per second and accelerations metres per second squared. Setup order below is acceleration, top speed, boosted limit, brake force, steering low/high angles in radians, steering response, grip recovery, handbrake slip and collision mass in kilograms:
+
+| Vehicle | Setup |
+| --- | --- |
+| hypercar | 17.8, 67, 83, 30, .46/.14, 9, 8, .23, 1250 |
+| spyder | 16.3, 62, 78, 28, .52/.17, 11, 6.6, .34, 1370 |
+| interceptor | 15.6, 65, 81, 31, .45/.135, 8, 8.5, .22, 1550 |
+| rally | 18.2, 55, 70, 29, .57/.19, 13, 11, .18, 1400 |
+| muscle | 19.4, 63, 80, 24, .43/.12, 7, 4.5, .40, 1670 |
+
+Coast drag, squared speed drag, wheelbase, power slip and boost acceleration are named constants in each setup, tuned against the actual route before release. Collision separation is weighted by those masses. A closing contact exchanges speed through an impulse with restitution .15 along the contact normal; parallel cars already touching do not suffer a new speed penalty every timestep. This prevents the old repeated .3 m/s penalty from trapping cars together. These are game balance values, not specifications for a real car. Garage character text comes from the same setup catalog. Car state gains a validated `vehicle` ID. Simulation uses its setup; the renderer uses the same ID. Default rival/traffic bodies retain the existing five body cycle.
+
+Race state gains `mode` (`circuit` or `pursuit`), `outcome` (`escaped`, `busted`, or null), three police car states and a pursuit object with heat, peakHeat, nearestDistance, escape and bust seconds. Pursuit begins with one officer 35 metres behind the player, starting from rest like the player. At 20 and 45 simulation seconds, one reinforcement is activated 65/85 metres behind on the same route, using an initial speed bounded by 18 to 40 m/s. Maximum heat and patrol count is three. Each officer follows a lookahead point with a lane near the player's offset, targets up to eight m/s above player speed when behind, slows for bends and uses its own bounded interceptor setup. Desired patrol speed is capped at 76/85/93 percent of the interceptor limit by heat; the bend allowance subtracts 75 times the heading change over the lookahead. Nitrous is reserved for heat three with a gap above 70 metres. A nearby stopped player makes the officer slow to approach instead of circling past. No active police position is assigned by the pursuit controller.
+
+Escape requires at least 20 seconds elapsed, absolute speed above 6 m/s, no active officer within 120 metres Euclidean distance, and eight uninterrupted seconds of that separation. Otherwise escape progress resets. Bust requires absolute speed below 5 m/s and an officer within 10 metres for four seconds; leaving that condition drains bust progress at twice real time. Bust wins if both terminal checks occur. Timers use the simulation timestep, including Speedbreaker, and stop on pause/results. Pursuit recovery centers the player on their current segment, stops them and clears escape progress. It retains bust progress and active officer positions. Inactive reinforcements neither collide nor render.
+
+| Action | Produced or displayed value | Source |
+| --- | --- | --- |
+| Read driver input | steer/throttle/brake/actions | Held keyboard keys, standard gamepad axes/buttons and the explicit chase direction mapping |
+| Select or restart car | mesh, physics, descriptive character | Validated vehicle ID, existing Blender template and handling setup |
+| Select or restart event | Circuit/Pursuit, cars, timers | Validated profile mode, existing Circuit setup or the pursuit constants above |
+| Police drive | steer, desired speed, boost | Track lookahead/curvature, player route offset/speed, relative route distance and interceptor setup |
+| Pursuit HUD/map | heat/count/distance/progress, police dots | Simulation elapsed, active police states, actual X/Z distance, escape/bust timers and map projection |
+| Pursuit result | outcome/time/peak heat/best escape | Terminal pursuit state, simulation elapsed, measured peakHeat, validated records.escape |
+| Circuit result | lap/race/standings | Unchanged ordered checkpoint rules and existing records.lap/race |
+| Recover player | current segment pose, speed, escape reset | Current projected route distance and track center, never a pursuit starting checkpoint |
+| Performance overlay | FPS, draws, triangles, resolution | Raw requestAnimationFrame intervals, renderer.info.render and current pixel ratio |
+| Auto quality | pixel ratio and shadow setting | Three one second windows below 45 FPS lower resolution .15; eight windows above 58 FPS raise it .10; bounds .65 to max(.65,min(devicePixelRatio,1.5)); shadows disabled at/below .8 and restored at/above 1.0 |
+| Spatial batch | geometry, poses, bounds | Unchanged deterministic placements grouped into 96 metre X/Z cells; actual per batch bounding spheres |
+
+The garage adds two event buttons above the car selectors and event rules beneath them. Circuit retains two lap/four racer facts. Pursuit shows up to three patrols and escape/bust conditions. The selected car caption gains a brief handling description and simulated speed cap. HUD replaces position/lap with a compact heat/contact panel during Pursuit, hides lap lines and uses red/blue police map dots. Pause/results use event specific labels and real outcomes. Existing fonts, images, amber/cyan tokens, focus indicators and responsive scrolling govern these small additions.
+
+Profile retains version 1 and the same storage key. Add `mode` default circuit, `showPerformance` default false, allow quality auto/high/low, and accept optional positive `records.escape`. Preserve prior valid paint, car, scene, volume, onboarding and Circuit records. Pursuit records update only for a real escaped terminal state. Auto starts with the normal capped pixel ratio and shadows; High is fixed at the normal cap, Reduced stays .8 with shadows disabled. Measurement windows reset across inactive screens and focus changes; no hidden tab intervals tune graphics.
+
+### Build plan
+- [x] AC-24: Reproduce driver direction through actual app handlers and chase projection, correct the mapping and verify reverse/dead zone/focus behavior.
+- [x] AC-25, AC-26, AC-27: Implement setup catalog and a complete selectable pursuit from garage through simulation, scene, audio, HUD and results.
+- [x] AC-28: Capture baseline workload, cluster unchanged placements, reduce repeated night light work and integrate real frame measurements/Auto settings.
+- [x] AC-24, AC-25, AC-26, AC-27, AC-28, AC-29: Run the available behavioral/asset checks, document measured limits and prepare the checked source for publication and replacement. Confirm delivery from native operation results.
+
+### Consequences and rationale
+This keeps the existing original Blender assets and local game architecture. Direct engine replacement would require rewriting working gameplay and scenes. A separate racing physics library could add tire realism but would make tuning and coordinate migration much broader than this task. Spatial batching permits culling without removing scenery or changing original asset files, but increases visible draw calls; GPU benefit must be checked on actual hardware. Auto graphics responds to frame time rather than guessing a device's performance. Pursuit is an original arcade event and does not include a career, weapons or recreated commercial pursuit systems.
+
+The baseline benchmark uses actual exported scenery and 48 camera poses per theme. Mean submitted scenery triangles are 3,281,149 forest, 3,269,096 alpine and 3,371,133 night. Whole circuit bounding spheres keep nearly every instance in the visible batch. Node CPU scene timing is separate from GPU FPS. The managed browser skill is unavailable in this session, so supported browser QA remains explicitly blocked while simulation, scene math, ownership and file checks continue.

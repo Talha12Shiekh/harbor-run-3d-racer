@@ -4,7 +4,8 @@ import test from 'node:test';
 import * as THREE from 'three';
 import {GLTFLoader} from '../dist/vendor/examples/jsm/loaders/GLTFLoader.js';
 import {World,prepareCar,cloneCar} from '../dist/world.js';
-import {Race,createTrack,aiInput,STEP} from '../dist/sim.js';
+import {Race,createTrack,aiInput,STEP,integrate} from '../dist/sim.js';
+import {wheelSteering} from '../dist/handling.js';
 import {VEHICLES} from '../dist/catalog.js';
 globalThis.self=globalThis;
 // Geometry validation uses an image metadata stub. It does not test GPU texture upload.
@@ -52,7 +53,7 @@ test('AC-12 front wheel axles stay level at every spin and steering angle',()=>{
   w.race.player.steer=steer;w.race.player.wheel=spin;w.update(1/60);
   for(const group of w.carMeshes[0].userData.wheelGroups){
    const axle=new THREE.Vector3(1,0,0).applyQuaternion(group.quaternion);
-   const turn=group.name.includes('Front')?steer*.2:0;
+   const turn=group.name.includes('Front')?wheelSteering(w.race.player):0;
    near(axle.y,0,'Spinning a steered wheel must not tilt its axle');
    near(axle.x,Math.cos(turn));near(axle.z,-Math.sin(turn));
   }
@@ -166,4 +167,28 @@ test('AC-22 six garage angles expose front, rear and both sides',()=>{
  w.setGarageView('front');w.update(1/60,false,true);assert.ok((w.camera.position.x-p.x)*Math.sin(p.heading)+(w.camera.position.z-p.z)*Math.cos(p.heading)>7);
  w.setGarageView('rear');w.update(1/60,false,true);assert.ok((w.camera.position.x-p.x)*Math.sin(p.heading)+(w.camera.position.z-p.z)*Math.cos(p.heading)<-7);
  w.setGarageView('invalid');assert.equal(w.garageView,'orbit');
+});
+
+test('AC-24 actual chase projection shows left and right turns correctly at every compass heading',()=>{
+ for(const heading of [0,Math.PI/2,Math.PI,Math.PI*1.5])for(const steer of [-1,1]){
+  const w=makeWorld(),c=w.race.player,p=w.track.at(60);Object.assign(c,{x:p.x,z:p.z,y:p.y,s:p.s,index:p.index,heading,speed:15,steer:0});w.followInitialized=false;w.update(1/60);w.camera.updateMatrixWorld(true);const initialCamera=w.camera.clone();
+  for(let i=0;i<12;i++)integrate(c,{throttle:.2,brake:0,steer},STEP,w.track);
+  w.update(1/60);w.scene.updateMatrixWorld(true);const front=new THREE.Vector3(0,.6,2).applyMatrix4(w.carMeshes[0].matrixWorld).project(initialCamera);
+  assert.ok(front.x*steer<0,'A positive world heading turn must appear left in the chase camera');
+ }
+});
+test('AC-26 pursuit scene shows only active interceptor patrols with isolated flashing lights',()=>{
+ const w=makeWorld();w.race.restart(undefined,'muscle','pursuit');w.attachCars();w.update(1/60);assert.equal(w.carMeshes[0].userData.vehicle,'muscle');
+ const indices=w.race.cars.map((c,i)=>c.police?i:-1).filter(i=>i>=0);assert.equal(indices.length,3);
+ for(const [unit,index] of indices.entries()){assert.equal(w.carMeshes[index].userData.vehicle,'interceptor');assert.equal(w.carMeshes[index].visible,unit===0);assert.equal(w.contactShadows[index].visible,unit===0);assert.ok(w.carMeshes[index].userData.police.length>0);}
+ const first=w.carMeshes[indices[0]],values=first.userData.police.map(m=>m.emissiveIntensity);w.update(.3);assert.notDeepEqual(first.userData.police.map(m=>m.emissiveIntensity),values);
+ w.race.elapsed=45;w.race.activatePolice();w.update(1/60);for(const i of indices){assert.equal(w.carMeshes[i].visible,true);assert.equal(w.contactShadows[i].visible,true);}assert.notEqual(first.userData.police[0],w.carMeshes[indices[1]].userData.police[0]);
+});
+test('AC-28 real World applies Auto resolution and shadows without changing fixed High/Reduced',()=>{
+ const w=makeWorld();globalThis.devicePixelRatio=1.5;globalThis.innerWidth=1280;globalThis.innerHeight=720;let ratio=1;
+ w.renderer={render(){},setPixelRatio(v){ratio=v;},getPixelRatio(){return ratio;},setSize(){},shadowMap:{enabled:true},info:{render:{calls:90,triangles:900000}}};
+ w.setQuality('auto');for(let i=0;i<25*3*5;i++)w.recordFrame(40,true);assert.equal(ratio,.75);assert.equal(w.renderer.shadowMap.enabled,false);assert.equal(w.performanceInfo.fps,25);assert.equal(w.performanceInfo.draws,90);assert.equal(w.performanceInfo.triangles,900000);
+ for(let i=0;i<63*8*3;i++)w.recordFrame(16,true);assert.ok(ratio>=1);assert.equal(w.renderer.shadowMap.enabled,true);
+ w.setQuality('high');for(let i=0;i<200;i++)w.recordFrame(40,true);assert.equal(ratio,1.5);assert.equal(w.renderer.shadowMap.enabled,true);
+ w.setQuality('low');for(let i=0;i<1000;i++)w.recordFrame(16,true);assert.equal(ratio,.8);assert.equal(w.renderer.shadowMap.enabled,false);
 });

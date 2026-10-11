@@ -1,20 +1,58 @@
-# Harbor Run 1.5.0 verification report
+# Harbor Run 1.6.0 verification report
 
 Date: 2026-10-11.
 
 ## Result
 
-The front view screenshot exposed lamp housings that intersected the painted hood. Two triangle probes were 37.7 and 39.9 mm beneath the surface. Original Blender lamp housings now subdivide and follow the hood, with projector cups, dark gaskets, continuous running lights and recessed bumper apertures. A closed lip connects the splitter to the nose. Accepted rear proportions remain, with added hood/engine cover seams and louvres.
+Driver steering was reversed relative to the real chase camera. Vehicles face positive Z, so the camera behind them has screen right toward negative X. Left/A and the left stick now increase world heading; right/D and the right stick decrease it. A regression first failed against the old actual app handler, then passed after the mapping fix. Actual Three.js camera projections verify both directions at four compass headings. Reverse uses the same wheel steering geometry.
 
-The five original cars are Apex H1, Strada S2, Sentinel I3, Kestrel R4 and Vanguard M5. Kestrel is a taller four door rally sedan with red five spoke wheels, contrasting stripes and a high wing. Vanguard has a long hood, two door cabin, round lamps, wide grille, twin hood stripes and ducktail. Every current mesh is authored for this project in Blender, without downloaded geometry.
+Every body now has its own acceleration, speed limits, braking, wheelbase, steering response, grip, drift and collision mass from dist/handling.js. Vehicle IDs govern both physics and the original Blender mesh, including saved selection and restarts. These are original arcade balance values, not manufacturer specifications. The accepted five body geometry and 22 editable Blender scenes remain.
 
-Midnight Run is a third presentation of the unchanged forest circuit. Original roadside lamp geometry, procedural night sky, cool moonlight, two attached player headlights, four nearby warm road spotlights and stronger tail lamps create its night presentation. Day/night switching restores the correct sky, reflection texture, fog and light values. The light pool stays fixed in size rather than creating a light for every pole. Player headlights do not cast extra shadow maps.
+The garage offers Circuit and Pursuit. Circuit keeps two ordered laps, three rivals and four traffic cars. Pursuit has traffic and an initial interceptor, with reinforcements at 20 and 45 simulation seconds. Active officers follow the road, intercept the player's lane and physically collide; they never teleport. Inactive officers do not render or collide. Police lamps flash during day and night. Synthesized siren level follows contact distance and stops outside active pursuit.
 
-Menus now have a cinematic title, optional first visit briefing, five thumbnail choices, three scene cards, labelled dropdowns, a detailed selected car caption, six camera choices and image headers on pause/results. Local Barlow and Barlow Condensed fonts use OFL licenses. Artwork is rendered from the actual original Blender models, not copied game screenshots. Enter and gamepad Start respect the visible onboarding screen.
+Heat, active patrol count, contact distance, escape and bust meters come from the simulation. Escape requires eight uninterrupted seconds beyond 120 metres after 20 seconds elapsed, with absolute speed over 6 m/s. Bust requires four seconds below 5 m/s within 10 metres of a patrol. Pause freezes the event. Pursuit recovery centers the player on the current segment, clears escape progress, retains bust progress and leaves police unchanged. Escape and bust results show actual event time and peak heat. Best escape is separate from existing lap/race records.
 
-## Exported geometry
+Full driving runs found a repeated contact penalty that could trap touching cars. Collision response now exchanges closing momentum with mass weighted separation and restitution .15. Parallel contact no longer removes .3 m/s every timestep. Patrol pace and corner braking were tuned with full driving runs. All five cars can physically escape without assigning positions or disabling officers. A stopped player can be caught and busted by officers driving to them.
 
-| Vehicle | Runtime width × height × length, metres | Triangles |
+## Measured scene workload
+
+The benchmark loads the actual scenery GLBs, installs all placements and samples 48 chase camera poses per theme using real Three.js frustum math. It measures submitted scenery geometry, not GPU time. Cars, signs, lights, skids, shadow passes and HUD are excluded from this geometric comparison.
+
+| Setting | Mean camera triangles before | Mean camera triangles after | Reduction | Mean camera batches before / after |
+| --- | --- | --- | --- | --- |
+| Redwood Ridge | 3,281,149 | 1,095,178 | 66.6% | 17.0 / 107.7 |
+| Summit Pass | 3,269,096 | 1,116,193 | 65.9% | 14.0 / 81.3 |
+| Midnight Run | 3,371,133 | 1,122,090 | 66.7% | 20.0 / 126.3 |
+
+Scenery is grouped into 96 metre spatial cells instead of one circuit wide batch per asset. Every original instance and triangle remains in the installed world. Per cell bounds let the renderer exclude batches outside camera and shadow volumes. More visible draw calls are a tradeoff. GPU frame time benefit must be checked on hardware rather than inferred from triangle reduction alone.
+
+| Setting | Unchanged placements | Spatial batches | Total installed triangles |
+| --- | --- | --- | --- |
+| Redwood Ridge | 1,073 | 357 | 3,293,736 |
+| Summit Pass | 1,072 | 260 | 3,269,096 |
+| Midnight Run | 1,105 | 423 | 3,383,720 |
+
+The night pool retains four road spotlights and two player headlights. Nearest roadside lamps are selected every .2 seconds with a bounded nearest four pass rather than sorting/allocating vectors each frame. Repeated Node scene update timing changed from 12.60 to 7.49 microseconds per call after warmup. Host CPU timings vary and exclude GPU rendering. They are not browser FPS.
+
+Auto graphics observes actual animation frame intervals. Three one second windows below 45 FPS reduce pixel ratio .15. Eight windows above 58 FPS restore .10. Ratio stays between .65 and the device cap up to 1.5. Shadows turn off at/below .8 and return at/above 1.0. High and Reduced remain fixed. Inactive screens and long hidden/stall intervals cannot tune quality. Settings can show actual FPS, renderer draw/triangle counters and resolution during play. Old profiles retain their selected graphics mode; new profiles default to Auto.
+
+Baseline and final measurements are in docs/specs/0001-city-racer/performance.json. Reproduce final measurements with `node --loader ./tests/three-resolver.mjs scripts/benchmark.mjs`.
+
+## Verification
+
+* `npm test`: 39 tests cover prior driving/checkpoint/record rules, five distinct setups, five complete Circuit races, five physically completed escapes, an actual police bust, no active patrol teleportation, reinforcements, collision momentum, pursuit pause/recovery/results and profile compatibility. Actual app handlers exercise every car/setting combination into the matching Pursuit countdown. Keyboard directions, opposed inputs, stick dead zone, D pad and focus loss are covered. Auto timing/bounds and siren distance/mute/resource reuse are covered.
+* `npm run check:model`: 15 actual scene tests plus all five GLB assertions. Actual chase projection at four headings, wheel steering from physics, active/inactive patrol meshes/lights, Auto shadows/resolution, grounding, finite transforms, hood lamp clearance, paint/brake isolation, restart ownership, night headlights, garage views and a complete legal Circuit are covered. The GPU render call is replaced.
+* `npm run check:world`: fourteen scenery/road/lamp GLBs retain finite geometry and expected materials/bounds/triangle totals. Three placement sets stay clear and grounded. Spatial batches retain every instance and triangle with limited bounds. Five actual theme switches preserve sky/reflections/light restoration and shared assets.
+* `npm run check`: 13 modules parse; imports, UI IDs, vehicle/scenery/font/image assets and hosting configuration resolve.
+* `git diff --check`: clean. Static runtime remains approximately 36 MB. No new dependencies or remote runtime requests were added.
+
+The DOM fixture executes actual handlers and simulation but does not render browser layout. Audio fixtures verify parameters and muting, not audible quality.
+
+## Original assets and source
+
+The five Blender vehicles retain their checked shapes, front lamps, connected splitters, glazing, interiors and grounded wheels.
+
+| Vehicle | Metres, width × height × length | Triangles |
 | --- | --- | --- |
 | Apex H1 | 2.284 × 1.167 × 4.600 | 92,129 |
 | Strada S2 | 2.264 × 1.177 × 4.600 | 90,863 |
@@ -22,34 +60,12 @@ Menus now have a cinematic title, optional first visit briefing, five thumbnail 
 | Kestrel R4 | 2.182 × 1.471 × 4.600 | 78,444 |
 | Vanguard M5 | 2.187 × 1.336 × 4.600 | 78,776 |
 
-Widths include mirrors. Every body has four grounded wheel pivots, stationary calipers, front/rear lamps, glazing, separate paint/brake material ownership and finite positions/normals. Body styles share the unchanged arcade physics. No differing performance rating is advertised.
+Widths include mirrors. Five vehicle scenes, fourteen prototypes and three composed circuits make 22 editable .blend files. Original scripts, 30 vehicle views, scene previews, menu imagery, local OFL fonts and the Windows rebuild script remain included. This release changes gameplay/batching and does not regenerate the accepted models. Commercial screenshots, downloaded meshes and gameplay frames are not shipped as assets.
 
-| Setting | Clear scenery placements | Kit batches including road/terrain | Instanced triangles |
-| --- | --- | --- | --- |
-| Redwood Ridge | 1,073 | 19 | 3,293,736 |
-| Summit Pass | 1,072 | 14 | 3,269,096 |
-| Midnight Run | 1,105 | 22 | 3,383,720 |
+## Browser checks still open
 
-These figures exclude cars, lights, signs, skids and UI. Night includes 32 lamp instances. All placements are deterministic and leave the driving corridor clear at corners, edge midpoints and center bounds probes. Terrain remains below every legal track sample. All settings preserve the same checkpoints and two lap race.
+Supported control-browser preview is unavailable in this managed workspace. Browser GPU shading, texture upload, transparency sorting, responsive menu appearance, physical gamepads, audible siren balance and FPS remain unverified. Node timings, camera geometry and fixtures cannot establish those outcomes.
 
-## Completed verification
+For hardware verification, select each car and scene, drive left/right and reverse, try both events, use pause/recovery/restart, and switch High/Reduced/Auto with the FPS overlay enabled. Check front/rear/side inspection, night road visibility and menu scrolling at the target display size. Compare frame rate on the same route before judging GPU performance.
 
-* `npm test`: 18 tests pass. Twelve cover the existing driving/race rules. Three cover valid choices, legacy records and onboarding persistence. Three execute the actual app event handlers in a DOM fixture through title, skip/continue briefing, car/scene selection, returning drivers, camera choices and Enter/gamepad Start into the real countdown. The fixture is not a browser layout or physical gamepad test.
-* `npm run check:model`: 12 scene tests pass plus assertions against all five GLBs. A ray test compares the exported headlamp housing points with the actual painted hood, requiring over 10 mm of clearance. Other checks cover grounded wheels, spin/steering, paint/brake isolation, selected geometry, five rival/traffic bodies, restarts, cameras, night headlight direction/intensity and a complete legal race. GPU rendering is stubbed.
-* `npm run check:world`: all fourteen GLBs load with finite geometry, expected bounds/materials and triangle totals. Three complete placement sets stay clear. Five real environment switches restore sky/reflections/light settings, release old roots and preserve shared assets. Invalid saved choices fall back safely without erasing valid paint or records.
-* `npm run check`: eleven runtime modules parse; local imports, UI IDs, vehicle/setting imagery, font URLs, GLBs and hosting configuration resolve.
-* `scripts/check-images.py`: 21 external and 29 embedded runtime images decode. Both original needle opacity maps retain transparent gaps and 45.5 percent coverage.
-* Thirty Blender vehicle views were reviewed in a six angle catalog. New sedan/coupe cabins gained inset windows and substantial painted pillars after the first render review. Night emitters were moved outside their housings and broad cool preview fill was added after lighting review. Forest/alpine/night previews, five thumbnails and title artwork were rendered from the actual original scenes.
-* `git diff --check` passes. Runtime static assets are approximately 36 MB. Transfer and GPU memory depend on which assets are loaded and cached.
-
-## Editable sources
-
-Five vehicle scenes, fourteen scenery/road/lamp prototypes and three composed circuits make 22 editable `.blend` files. Original vehicle and scenery scripts, the new night asset script, original sky generation, three placement inputs, multi angle views and menu rendering scripts are included. Textures are packed where applicable. No reference gameplay frames or manufacturer photos are shipped as game artwork.
-
-`Rebuild-Blender-Assets.ps1` finds the user's installed Blender or accepts an explicit path. RenderVehicles generates all six views and the garage thumbnails. RenderScenes generates scene cards/title and composed circuits. Blender 4.5.3 CLI builds/renders were run here; the Windows wrapper was reviewed but not executed on Windows.
-
-## Limits
-
-Supported browser preview control is unavailable in this managed workspace. Browser GPU appearance, texture upload, transparency sorting, final responsive layout, physical controllers and FPS remain unverified. CPU scene and DOM fixtures cannot establish those outcomes. Blender previews use path tracing and broad fill; they show authored models and composition, not the browser render.
-
-References are the supplied screenshots/MP4, official manufacturer photos and EA media/manuals. This is an original approximation of those forms and atmosphere. Commercial model/map identity and exact visual matching are not claimed. Reflections come from the selected environment; dynamic nearby car/tree reflections are absent. Police pursuit AI, career, tuning and touch driving remain outside this circuit.
+Reference similarity remains an approximation of the supplied footage/photos. Reflections are environment based; dynamic nearby car/tree reflections are absent. Career, upgrades, player tuning, more routes and touch driving remain future work.

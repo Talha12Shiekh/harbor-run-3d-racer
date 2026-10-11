@@ -1,0 +1,109 @@
+{
+  "before_1_5": {
+    "kind": "Node CPU and 48 geometric camera samples per theme",
+    "gpuFps": "unverified",
+    "scenery": [
+      {
+        "theme": "forest",
+        "placements": 1073,
+        "totalBatches": 19,
+        "totalTriangles": 3293736,
+        "meanCameraBatches": 17,
+        "meanCameraTriangles": 3281149
+      },
+      {
+        "theme": "alpine",
+        "placements": 1072,
+        "totalBatches": 14,
+        "totalTriangles": 3269096,
+        "meanCameraBatches": 14,
+        "meanCameraTriangles": 3269096
+      },
+      {
+        "theme": "night",
+        "placements": 1105,
+        "totalBatches": 22,
+        "totalTriangles": 3383720,
+        "meanCameraBatches": 20,
+        "meanCameraTriangles": 3371133
+      }
+    ],
+    "nightSceneMicrosecondsPerUpdate": 12.6,
+    "simulation": [
+      {
+        "vehicle": "hypercar",
+        "microsecondsPerStep": 19.82
+      },
+      {
+        "vehicle": "spyder",
+        "microsecondsPerStep": 12.64
+      },
+      {
+        "vehicle": "interceptor",
+        "microsecondsPerStep": 11.95
+      },
+      {
+        "vehicle": "rally",
+        "microsecondsPerStep": 11.21
+      },
+      {
+        "vehicle": "muscle",
+        "microsecondsPerStep": 11.86
+      }
+    ]
+  },
+  "after_1_6": {
+    "kind": "Node CPU and 48 geometric camera samples per theme",
+    "gpuFps": "unverified",
+    "scenery": [
+      {
+        "theme": "forest",
+        "placements": 1073,
+        "totalBatches": 357,
+        "totalTriangles": 3293736,
+        "meanCameraBatches": 107.7,
+        "meanCameraTriangles": 1095178
+      },
+      {
+        "theme": "alpine",
+        "placements": 1072,
+        "totalBatches": 260,
+        "totalTriangles": 3269096,
+        "meanCameraBatches": 81.3,
+        "meanCameraTriangles": 1116193
+      },
+      {
+        "theme": "night",
+        "placements": 1105,
+        "totalBatches": 423,
+        "totalTriangles": 3383720,
+        "meanCameraBatches": 126.3,
+        "meanCameraTriangles": 1122090
+      }
+    ],
+    "nightSceneMicrosecondsPerUpdate": 7.49,
+    "simulation": [
+      {
+        "vehicle": "hypercar",
+        "microsecondsPerStep": 18.17
+      },
+      {
+        "vehicle": "spyder",
+        "microsecondsPerStep": 12.71
+      },
+      {
+        "vehicle": "interceptor",
+        "microsecondsPerStep": 11.92
+      },
+      {
+        "vehicle": "rally",
+        "microsecondsPerStep": 11.26
+      },
+      {
+        "vehicle": "muscle",
+        "microsecondsPerStep": 11.3
+      }
+    ]
+  },
+  "limits": "Node CPU and geometric frustum samples, not GPU/browser FPS. Visible batch count rises while submitted triangle count falls. No assets or placements removed."
+}

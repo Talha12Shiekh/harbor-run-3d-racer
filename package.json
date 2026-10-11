@@ -1,10 +1,10 @@
 {
   "name": "harbor-run",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/driving.test.mjs tests/garage.test.mjs tests/menu-flow.test.mjs",
+    "test": "node --test tests/driving.test.mjs tests/garage.test.mjs tests/menu-flow.test.mjs tests/handling-pursuit.test.mjs tests/performance.test.mjs tests/audio.test.mjs",
     "check": "node scripts/check.mjs",
     "check:model": "node --loader ./tests/three-resolver.mjs tests/car-asset.mjs",
     "check:world": "node --loader ./tests/three-resolver.mjs tests/wilderness-assets.mjs"
