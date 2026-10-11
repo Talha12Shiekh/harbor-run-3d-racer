@@ -1,0 +1,17 @@
+# Harbor Run
+
+Source: the accepted Most Wanted 2005 reference direction, restored from the conversation after workspace loss.
+
+## Character
+Detailed daylight city racing, low chase camera, worn asphalt, warm brick buildings, reflective sports cars and restrained amber instruments. This is an original circuit and interface inspired by the reference.
+
+## Build mandate
+The menu shows the real rendered car and city behind a dark editorial panel. Racing fills the viewport with the 3D world. Position and lap occupy the top left, race time the top right, route the bottom left and a circular speed instrument the bottom right. Nitro and Speedbreaker have separate meters. Pause, finish, loading and failure have complete overlays.
+
+Three.js renders detailed GLB geometry, physical materials, photo textures, environment reflections and shadows. Building silhouettes use modular geometry with window frames, recesses, doors, roof detail and street props. Avoid untextured block scenery.
+
+## Tokens
+The authoritative interface tokens are in dist/style.css. The type uses the browser's installed sans family with strong italic display typography. The amber accent carries key actions, white carries timing and speed, cyan carries nitrous.
+
+## Responsive behavior
+Menus adapt to narrow screens. The actual game requires a keyboard or standard gamepad. HUD contracts below 800px. Reduced motion disables the menu orbit. Focus states remain visible on every control.
