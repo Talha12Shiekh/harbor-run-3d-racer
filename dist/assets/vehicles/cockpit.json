@@ -1,0 +1,27 @@
+{
+  "originalGeometry": true,
+  "authoring": "Blender 4.5.3 LTS",
+  "animatedGroups": [
+    "CockpitSteering",
+    "SpeedNeedle",
+    "RpmNeedle"
+  ],
+  "dimensions": [
+    1.7417715787887573,
+    0.684999942779541,
+    1.425000011920929
+  ],
+  "triangles": 24892,
+  "bounds": {
+    "min": [
+      -0.8708857893943787,
+      0.48500001430511475,
+      -0.4449999928474426
+    ],
+    "max": [
+      0.8708857893943787,
+      1.1699999570846558,
+      0.9800000190734863
+    ]
+  }
+}
