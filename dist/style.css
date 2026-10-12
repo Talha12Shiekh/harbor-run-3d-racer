@@ -175,3 +175,5 @@
  .instrument{height:238px;bottom:160px}.speed-readout{top:36px;left:18px;width:136px}.speed-readout>strong{font-size:48px}.gear{gap:6px;margin-top:7px}.gear b{font-size:22px}.resources{top:167px;left:8px;right:8px;gap:8px}.resources label>span{letter-spacing:0}.route-map{bottom:160px}.route-map canvas{width:136px;height:118px}
  .race-status{padding:0}.position{font-size:34px}.position small{font-size:18px}.status-labels{padding-left:7px}.status-labels strong{font-size:var(--control-text)}.times{padding:0;max-width:46%}.times strong{font-size:22px}.pursuit-status{max-width:calc(100vw - 190px)}.pursuit-heading strong{font-size:19px}.race-message{font-size:88px}
 }
+
+.race-message[data-recovery="true"]{top:24%;max-width:90vw;font-size:clamp(18px,2.2vw,30px);font-style:normal;font-weight:700;letter-spacing:.09em;line-height:1.3}

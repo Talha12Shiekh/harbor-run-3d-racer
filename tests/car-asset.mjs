@@ -10,6 +10,9 @@ import {VEHICLES} from '../dist/catalog.js';
 import {DRIVING_VIEWS,SEATS,cameraPose} from '../dist/cameras.js';
 import {prepareCockpit} from '../dist/cockpit.js';
 import {ImpactEffects} from '../dist/impact-effects.js';
+import {damageCar} from '../dist/destruction.js';
+import {StructuralDebris} from '../dist/damage-visuals.js';
+import {assetParts} from '../dist/wilderness.js';
 globalThis.self=globalThis;
 // Geometry validation uses an image metadata stub. It does not test GPU texture upload.
 globalThis.createImageBitmap=async()=>({width:1024,height:1024,close(){}});
@@ -21,7 +24,7 @@ for(const metadata of catalog.vehicles){
  assert.equal(metadata.originalGeometry,true);assert.ok(size.z>4.4&&size.z<4.7);assert.ok(size.x>1.5&&size.x<2.35);assert.ok(size.y>1.05&&size.y<1.55);assert.equal(car.userData.wheelGroups.length,4);assert.ok(car.userData.paints.length);assert.ok(car.userData.brakes.length);
  let triangles=0,glazing=0,frontLampZ=-Infinity,rearLampZ=Infinity;
  car.traverse(o=>{if(!o.isMesh)return;triangles+=o.geometry.attributes.position.count/3;for(const value of o.geometry.attributes.position.array)assert.ok(Number.isFinite(value));const m=o.material,b=new THREE.Box3().setFromObject(o);if(m.name==='Glass glazing'){glazing++;assert.ok(m.transparent&&m.opacity>.1&&m.opacity<.7);assert.equal(m.depthWrite,false);}if(m.name==='Projector light')frontLampZ=Math.max(frontLampZ,b.max.z);if(m.name==='Brakelight red')rearLampZ=Math.min(rearLampZ,b.min.z);});
- assert.equal(glazing,1);assert.ok(frontLampZ>1.9);assert.ok(rearLampZ< -1.9);
+ assert.equal(glazing,metadata.id==='spyder'?1:4,'Glazing must remain separated by real window orientation');assert.equal(triangles,metadata.triangles);assert.ok(frontLampZ>1.9);assert.ok(rearLampZ< -1.9);
  for(const group of car.userData.wheelGroups){const b=new THREE.Box3().setFromObject(group);assert.ok(Math.abs(b.min.y)<.003,'Tires must meet the ground');assert.ok((group.name.includes('Front')?group.position.z:-group.position.z)>1.3);group.traverse(o=>{if(o.isMesh)assert.notEqual(o.material.name,'Fixed caliper','Brake calipers stay fixed');});for(const spin of [Math.PI/3,Math.PI,19]){group.rotation.x=spin;car.updateMatrixWorld(true);assert.ok(Math.abs(b.getCenter(new THREE.Vector3()).y-new THREE.Box3().setFromObject(group).getCenter(new THREE.Vector3()).y)<.015,'Wheel pivot is eccentric');}group.rotation.x=0;}
  const other=cloneCar(template,'#b72227');assert.notEqual(car.userData.paints[0],other.userData.paints[0]);assert.equal(other.userData.paints[0].color.getHexString(),'b72227');reports.push({id:metadata.id,dimensions:size.toArray().map(v=>+v.toFixed(3)),triangles,wheels:4});
 }
@@ -162,13 +165,13 @@ test('AC-12 repeated restarts release unique resources and preserve shared car a
  try{
   for(let n=0;n<4;n++){
    const oldCars=[...w.carMeshes],oldShadows=[...w.contactShadows],owned=new Set(),counts=new Map();
-   for(const car of oldCars){for(const m of [...car.userData.paints,...car.userData.brakes,...car.userData.police])owned.add(m);owned.add(car.userData.flame.geometry);owned.add(car.userData.flame.material);}
+   for(const car of oldCars){for(const m of [...car.userData.paints,...car.userData.brakes,...car.userData.police,...car.userData.damageRig.owned])owned.add(m);owned.add(car.userData.flame.geometry);owned.add(car.userData.flame.material);}
    for(const shadow of oldShadows){owned.add(shadow.geometry);owned.add(shadow.material);}
    for(const resource of owned){counts.set(resource,0);resource.addEventListener('dispose',()=>counts.set(resource,counts.get(resource)+1));}
    w.race.restart('#dfd8c6');w.attachCars();w.update(1/60);
    for(const resource of owned)assert.equal(counts.get(resource),1,'An old car resource must be released exactly once');
    assert.equal(sharedDisposals,0,'Restart must preserve shared geometry, materials and textures');
-   assert.equal(w.carMeshes.length,8);assert.equal(w.contactShadows.length,8);assert.equal(w.scene.children.length,17);assert.equal(w.scene.children.filter(o=>o===w.impactEffects.root).length,1);
+   assert.equal(w.carMeshes.length,8);assert.equal(w.contactShadows.length,8);assert.equal(w.scene.children.length,18);assert.equal(w.scene.children.filter(o=>o===w.impactEffects.root).length,1);
    for(const old of [...oldCars,...oldShadows])assert.equal(old.parent,null);
    for(const m of w.carMeshes[0].userData.paints)assert.equal(m.color.getHexString(),'dfd8c6');
   }
@@ -211,7 +214,7 @@ test('AC-19 headlight housings remain above the hood after GLB preparation',()=>
  for(const id of ['hypercar','spyder','interceptor']){
   const car=cloneCar(templates.get(id),'#3446c7');car.updateMatrixWorld(true);const paint=[],housings=[];
   car.traverse(o=>{if(o.isMesh&&o.material.name==='Paint Pearl')paint.push(o);if(o.isMesh&&o.material.name.startsWith('Headlamp housing'))housings.push(o);});
-  assert.equal(housings.length,2);let tested=0,min=Infinity;const ray=new THREE.Raycaster(),p=new THREE.Vector3();
+  assert.equal(new Set(housings.map(m=>m.material.name)).size,2,'Both original lamp housings remain');let tested=0,min=Infinity;const ray=new THREE.Raycaster(),p=new THREE.Vector3();
   for(const o of housings){const points=o.geometry.attributes.position;for(let i=0;i<points.count;i+=47){p.fromBufferAttribute(points,i).applyMatrix4(o.matrixWorld);ray.set(new THREE.Vector3(p.x,2,p.z),new THREE.Vector3(0,-1,0));const hit=ray.intersectObjects(paint,false)[0];if(hit){min=Math.min(min,p.y-hit.point.y);tested++;}}}
   assert.ok(tested>50,id+' lamp surfaces not sampled');assert.ok(min>.010,id+' headlight housing intersects hood: '+min);
  }
@@ -256,4 +259,32 @@ test('AC-28 real World applies Auto resolution and shadows without changing fixe
  for(let i=0;i<63*8*3;i++)w.recordFrame(16,true);assert.ok(ratio>=1);assert.equal(w.renderer.shadowMap.enabled,true);
  w.setQuality('high');for(let i=0;i<200;i++)w.recordFrame(40,true);assert.equal(ratio,1.5);assert.equal(w.renderer.shadowMap.enabled,true);
  w.setQuality('low');for(let i=0;i<1000;i++)w.recordFrame(16,true);assert.equal(ratio,.8);assert.equal(w.renderer.shadowMap.enabled,false);
+});
+
+const destructionKit=new Map();
+for(const name of ['masonry-chunk','guardrail','crash-frame']){const b=await readFile(new URL('../dist/assets/wilderness/'+name+'.glb',import.meta.url));destructionKit.set(name,{parts:assetParts((await new GLTFLoader().parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'')).scene)});}
+function visualHit(w,zone,energy,closing=25){const c=w.race.player,local=zone==='front'?[0,2]:zone==='left'?[-1,0]:[1,0];damageCar(c,{x:c.x+local[0]*Math.cos(c.heading)+local[1]*Math.sin(c.heading),z:c.z-local[0]*Math.sin(c.heading)+local[1]*Math.cos(c.heading),closing,severity:.8,kind:'impact'},energy);}
+test('AC-47 every body crumples real vertices while undamaged rivals and shared templates remain unchanged',()=>{
+ const w=makeWorld();
+ for(const id of templates.keys()){w.race.resetPlayer();w.setVehicle(id);w.update(0);const car=w.carMeshes[0],other=w.carMeshes[1],rig=car.userData.damageRig,shared=templates.get(id).children.filter(m=>m.isMesh).map(m=>m.geometry.attributes.position.array.slice()),rival=other.userData.damageRig.parts.map(p=>p.mesh.geometry.attributes.position.array.slice());visualHit(w,'front',40000);w.update(0);let changed=0;
+  for(const part of rig.parts){const a=part.mesh.geometry.attributes.position.array;for(let i=0;i<a.length;i++){if(a[i]!==part.original[i])changed++;assert.ok(Number.isFinite(a[i]));}for(const v of part.mesh.geometry.attributes.normal.array)assert.ok(Number.isFinite(v));assert.equal(part.mesh.visible,true);}
+  assert.ok(changed>500,id+' must visibly deform');for(const [i,p] of other.userData.damageRig.parts.entries())assert.deepEqual(p.mesh.geometry.attributes.position.array,rival[i]);for(const [i,m] of templates.get(id).children.filter(m=>m.isMesh).entries())assert.deepEqual(m.geometry.attributes.position.array,shared[i]);assert.equal(w.structuralDebris.parts.length,0);
+ }
+});
+test('AC-47 severe front damage exposes the chassis, detaches original panels and repairs exactly once on R',()=>{
+ const w=makeWorld();w.kit=destructionKit;w.attachCars();w.update(0);const car=w.carMeshes[0],rig=car.userData.damageRig;visualHit(w,'front',100000);w.update(0);const detached=rig.parts.filter(p=>p.detached);assert.ok(detached.some(p=>p.name==='hood'));assert.ok(detached.some(p=>p.name==='frontBumper'));assert.ok(detached.some(p=>p.name==='glassFront'));assert.ok(detached.every(p=>p.mesh.visible===false));assert.equal(car.userData.damageFrame.visible,true);assert.ok(w.structuralDebris.parts.length>detached.length);const shards=w.structuralDebris.parts.filter(p=>p.mesh.material.name==='Glass glazing');assert.ok(shards.length>1);assert.ok(shards.every(p=>p.mesh.geometry.attributes.position.count<detached.find(p=>p.name==='glassFront').mesh.geometry.attributes.position.count),'A windshield must split into smaller pieces');assert.equal(car.userData.headlights[0].intensity,0);
+ for(const p of w.structuralDebris.parts){assert.ok(p.mesh.geometry.attributes.position.count>3);assert.ok(p.mesh.position.toArray().every(Number.isFinite));assert.notEqual(p.mesh.geometry,detached[0].mesh.geometry);}
+ const count=w.structuralDebris.parts.length;w.update(0);assert.equal(w.structuralDebris.parts.length,count);w.race.resetPlayer();w.update(0);for(const p of rig.parts){assert.deepEqual(p.mesh.geometry.attributes.position.array,p.original);assert.deepEqual(p.mesh.geometry.attributes.normal.array,p.normal);assert.equal(p.mesh.visible,true);assert.equal(p.detached,false);}assert.equal(car.userData.damageFrame.visible,false);assert.equal(w.structuralDebris.parts.length,count,'Recovery does not replay or duplicate detached parts');
+});
+test('AC-47 glazing cracks before breaking and only the affected side loses its door panel',()=>{
+ const w=makeWorld();w.kit=destructionKit;w.attachCars();w.update(0);visualHit(w,'left',40000);w.update(0);const rig=w.carMeshes[0].userData.damageRig,left=rig.parts.filter(p=>p.name==='glassLeft'),right=rig.parts.filter(p=>p.name==='glassRight');assert.ok(left.length&&right.length);for(const p of left){assert.ok(p.mesh.material.map?.isDataTexture);assert.equal(p.mesh.material.roughness,.75);assert.equal(p.mesh.visible,true);}for(const p of right)assert.equal(p.mesh.material.map,p.map);visualHit(w,'left',60000);w.update(0);assert.equal(w.carMeshes[0].userData.damageFrame.visible,false,'A side hit must not expose the radiator through an intact hood');assert.ok(rig.parts.filter(p=>p.name==='leftPanel').every(p=>!p.mesh.visible));assert.ok(rig.parts.filter(p=>p.name==='rightPanel').every(p=>p.mesh.visible));
+ w.setDrivingView('cockpit');w.update(0);w.setDrivingView('chase');w.update(0);for(const p of left)assert.equal(p.mesh.visible,false,'Camera switching cannot restore broken glass');for(const p of right)assert.equal(p.mesh.visible,true);
+});
+test('AC-49 actual body and attached cameras rotate around one centre during a wreck',()=>{
+ const w=makeWorld();for(const id of templates.keys()){w.setVehicle(id);const c=w.race.player;Object.assign(c,{bodyRoll:1.2,bodyPitch:.4,heading:1.1,airborne:true,steer:0,slip:0,speed:0,y:9});for(const view of ['cockpit','hood']){w.setDrivingView(view);w.update(0);w.scene.updateMatrixWorld(true);const seat=view==='cockpit'?SEATS[id].eye:[0,SEATS[id].hood,1.05],expected=new THREE.Vector3(...seat).applyMatrix4(w.carMeshes[0].matrixWorld);assert.ok(w.camera.position.distanceTo(expected)<1e-6);const up=new THREE.Vector3(0,1,0).applyQuaternion(w.carMeshes[0].quaternion);assert.ok(w.camera.up.distanceTo(up)<1e-6);assert.equal(w.drivingView,view);assert.ok(w.camera.quaternion.toArray().every(Number.isFinite));}w.setDrivingView('chase');w.update(0);assert.deepEqual(w.camera.up.toArray(),[0,1,0]);}
+});
+test('AC-51 debris pauses, stays capped and releases every owned resource on expiry and restart',()=>{
+ const w=makeWorld(),pool=w.structuralDebris,source=w.carMeshes[0].userData.damageRig.parts.find(p=>p.name==='frontBumper').mesh,c=w.race.player;for(let i=0;i<30;i++)pool.carPart(source,w.carMeshes[0],c);assert.equal(pool.parts.filter(p=>p.kind==='car').length,24);
+ const event={broken:true,surface:'masonry',section:{x:c.x,y:c.y,z:c.z,heading:c.heading},nx:1,nz:0,vx:20,vz:2};for(let i=0;i<10;i++)pool.barrier(event,destructionKit);assert.equal(pool.parts.filter(p=>p.kind==='barrier').length,64);const owned=pool.parts.flatMap(p=>[p.mesh.geometry,p.mesh.material]),counts=new Map(owned.map(r=>[r,0]));for(const r of owned)r.addEventListener('dispose',()=>counts.set(r,counts.get(r)+1));
+ const before=pool.parts.map(p=>p.mesh.position.toArray());pool.update(0);assert.deepEqual(pool.parts.map(p=>p.mesh.position.toArray()),before);for(let i=0;i<1000;i++)pool.update(1/120);assert.equal(pool.parts.length,0);assert.equal(pool.root.children.length,0);for(const n of counts.values())assert.equal(n,1);pool.carPart(source,w.carMeshes[0],c);w.race.restart();w.attachCars();assert.equal(pool.parts.length,0);assert.equal(w.structuralDebris,pool);
 });

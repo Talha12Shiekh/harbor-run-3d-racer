@@ -22,6 +22,8 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Scenery build failed.' }
     & $BlenderPath --background --factory-startup --python assets-src/build_night.py
     if ($LASTEXITCODE -ne 0) { throw 'Night asset build failed.' }
+    & $BlenderPath --background --factory-startup --python assets-src/build_destruction_assets.py
+    if ($LASTEXITCODE -ne 0) { throw 'Destruction asset build failed.' }
     if ($RenderVehicles) {
         & $BlenderPath --background --factory-startup --python assets-src/render_ui.py
         if ($LASTEXITCODE -ne 0) { throw 'Garage thumbnail render failed.' }

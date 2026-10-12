@@ -1,4 +1,5 @@
 // Original camera presets. Coordinates are metres in the car's +Z forward frame.
+import {bodyCentre} from './destruction.js';
 export const DRIVING_VIEWS=Object.freeze([
  {id:'chase',label:'Chase'}, {id:'wide',label:'Wide chase'},
  {id:'tracking',label:'Tracking'}, {id:'hood',label:'Hood'}, {id:'cockpit',label:'Cockpit'}
@@ -28,7 +29,8 @@ export function isDriverRoof(id,[x,y,z]){
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export function cameraPose(car,view='chase',yaw=-.72,rear=false,reducedMotion=false){
  const seat=SEATS[car.vehicle]??SEATS.hypercar,mode=rear?'rear':drivingView(view).id,speed=clamp(Math.abs(car.speed)/67,0,1);
- const place=([x,y,z])=>[car.x+Math.cos(car.heading)*x+Math.sin(car.heading)*z,car.y+y+.03,car.z-Math.sin(car.heading)*x+Math.cos(car.heading)*z];
+ const attached=mode==='cockpit'||mode==='hood',rotate=([x,y,z])=>{const roll=attached?(car.bodyRoll??0):0,pitch=attached?(car.bodyPitch??0):0,xx=x*Math.cos(roll)-y*Math.sin(roll),yy=x*Math.sin(roll)+y*Math.cos(roll),py=yy*Math.cos(pitch)-z*Math.sin(pitch),pz=yy*Math.sin(pitch)+z*Math.cos(pitch);return [Math.cos(car.heading)*xx+Math.sin(car.heading)*pz,py,-Math.sin(car.heading)*xx+Math.cos(car.heading)*pz];};
+ const place=([x,y,z])=>{const centre=attached?bodyCentre(car):0,p=rotate([x,y-centre,z]);return [car.x+p[0],car.y+centre+p[1]+.03,car.z+p[2]];};
  let eye,look,fov,near=.1;
  if(mode==='rear'){eye=[0,2.4,8];look=[0,.9,-8];fov=61;}
  else if(mode==='tracking'){const a=wrapYaw(yaw);eye=[Math.sin(a)*7.5,1.45,Math.cos(a)*7.5];look=[0,.55,0];fov=50;}
@@ -37,5 +39,5 @@ export function cameraPose(car,view='chase',yaw=-.72,rear=false,reducedMotion=fa
   const turn=reducedMotion?0:clamp(car.steer,-1,1)*.12;
   look=[eye[0]+Math.sin(turn)*28,eye[1]-.06,eye[2]+Math.cos(turn)*28];fov=mode==='cockpit'?76:67;near=mode==='cockpit'?.035:.08;
  }else{eye=[0,mode==='wide'?3.8:2.4,-(mode==='wide'?11.5+speed*1.5:7.1+speed)];look=[0,.9,mode==='wide'?13:9];fov=(mode==='wide'?65:57)+speed*8+(car.boosting?4:0);}
- return {eye:place(eye),look:place(look),fov,near,inside:mode==='cockpit',mode};
+ return {eye:place(eye),look:place(look),up:rotate([0,1,0]),fov,near,inside:mode==='cockpit',mode};
 }

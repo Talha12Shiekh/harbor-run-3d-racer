@@ -1,6 +1,6 @@
 # Harbor Run
 
-Current direction: the user authorized the 1.8.0 collision feedback update in docs/specs/0001-city-racer/index.md. The accepted 1.7.2 title and HUD composition remains. Earlier city/sedan choices remain historical rationale.
+Current direction: the user authorized the 1.9.0 vehicle destruction and barrier breach update in docs/specs/0001-city-racer/index.md. The accepted 1.7.2 title and HUD composition remains. Earlier city/sedan choices remain historical rationale.
 
 ## Character
 
@@ -61,3 +61,10 @@ Token values are authoritative in dist/style.css. The color calculation compares
 ## Contact effects
 
 Keep the open driving view and current HUD composition. Contact feedback belongs in the actual world: warm directional spark streaks, small spinning fragments and a brief soft dust burst at the bumper or scrape point. A short shared light can illuminate nearby surfaces. Strength comes from real closing speed, with lighter sparks and a continuous gritty sound for sliding. Body movement and camera recoil are brief and bounded, with a much smaller cabin movement. Reduced motion disables camera shake and the contact flash. Reduced graphics lowers particle emission. Player contacts take priority when several effects compete for fixed pools. Full screen flashes, crash captions and cutaway camera sequences are not part of this update.
+
+
+## Persistent destruction
+
+Keep intact vehicle silhouettes and the accepted scene composition. Real front/rear/side geometry crumples locally; trim and lamp housings follow that deformation. Panels detach from the original mesh, and shattered glazing splits into smaller pieces. Show the exposed frame and radiator when front panels are removed; a side hit must not put the radiator through an intact hood. Materials and geometry belong to each damaged car, while templates remain reusable.
+
+Masonry stretches share the existing route and instancing workflow. Damage leans and compresses the matching section; a broken section leaves a real opening with moving chipped blocks or steel pieces. Falling cars rotate around their body centre and land on the authored bank/height map. Cabin views inherit the same rotation and up vector. Exterior views preserve their selection. A small amber recovery line uses the existing unboxed HUD text treatment. R repairs the car, a new event restores barriers, and no offroad wreck can count a checkpoint or pursuit escape. Fixed debris caps and lifetimes bound resource use; rendered GPU performance remains a separate hardware check.

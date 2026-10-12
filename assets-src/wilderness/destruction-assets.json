@@ -1,0 +1,78 @@
+{
+  "authoring": "Blender 4.5.3",
+  "originalGeometry": true,
+  "assets": [
+    {
+      "name": "masonry-barrier",
+      "file": "masonry-barrier.glb",
+      "kind": "prop",
+      "originalGeometry": true,
+      "dimensions": [
+        0.6800000071525574,
+        0.9770703315734863,
+        6.0249998569488525
+      ],
+      "triangles": 4512,
+      "bounds": {
+        "min": [
+          -0.3400000035762787,
+          -0.002070307731628418,
+          -3.0324997901916504
+        ],
+        "max": [
+          0.3400000035762787,
+          0.9750000238418579,
+          2.992500066757202
+        ]
+      }
+    },
+    {
+      "name": "masonry-chunk",
+      "file": "masonry-chunk.glb",
+      "kind": "fracture",
+      "originalGeometry": true,
+      "dimensions": [
+        0.5799999833106995,
+        0.2877677381038666,
+        0.9850000143051147
+      ],
+      "triangles": 188,
+      "bounds": {
+        "min": [
+          -0.28999999165534973,
+          0.004999995231628418,
+          -0.4925000071525574
+        ],
+        "max": [
+          0.28999999165534973,
+          0.292767733335495,
+          0.4925000071525574
+        ]
+      }
+    },
+    {
+      "name": "crash-frame",
+      "file": "crash-frame.glb",
+      "kind": "vehicle-detail",
+      "originalGeometry": true,
+      "dimensions": [
+        1.2360000014305115,
+        0.4950000047683716,
+        3.5
+      ],
+      "triangles": 4788,
+      "bounds": {
+        "min": [
+          -0.6180000305175781,
+          0.2549999952316284,
+          -1.5499999523162842
+        ],
+        "max": [
+          0.6179999709129333,
+          0.75,
+          1.9500000476837158
+        ]
+      }
+    }
+  ]
+}

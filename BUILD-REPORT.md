@@ -1,6 +1,28 @@
-# Harbor Run 1.8.0 verification report
+# Harbor Run 1.9.0 verification report
 
 Date: 2026-10-12.
+
+## Vehicle destruction and roadside breaches, 1.9.0
+
+Strong impacts now accumulate independent front/rear/left/right damage using actual contact energy and mass. The original body meshes are partitioned without dropping or adding intact triangles. Each car owns its deformed geometry and material state; templates and other cars remain unchanged. Panels crumple locally, trim and lamp housings follow, glazing cracks and shatters into smaller actual mesh pieces, and bumpers, hoods and side panels detach. An exposed chassis/radiator appears after front panels are removed. Wrecked driving cuts powered acceleration and engine sound; lesser front damage reduces acceleration.
+
+Original Blender masonry sections and chipped blocks join the instanced scenery. Masonry and steel rails use stable placement IDs shared by physics and rendering. Distinct low energy hits accumulate damage and deflect the car. Strong hits remove the matching instances, emit actual masonry/steel pieces, and preserve enough motion to pass through the gap. Openings persist after R recovery. Hard car contacts apply bounded lateral and angular motion, including a tested side impact that pushes a recipient through a masonry section.
+
+The active race uses placed barriers rather than the old road clamp. Beyond the verge, body height follows gravity and the authored bank/height map, with roll/pitch support, landing rebound and drag. Ground landings emit the existing impact feedback. Cockpit and Hood inherit body rotation and up vectors; exterior view selection remains stable. Airborne, offroad and wrecked travel cannot grant gates or pursuit escape. R repairs and recovers the car while retaining openings and progress. A new event restores the barriers. NPC wrecks recover through the existing stuck interval. The existing unboxed HUD shows a compact recovery hint.
+
+Actual detached pieces expire after eight simulation seconds, capped at 24 car pieces and 64 barrier chunks. Pause freezes them, and eviction, expiry, garage, scenery change and new events release owned geometry/materials. Shared templates, maps and effect resources survive. Broken masonry selects a new original crunch/rubble waveform under the existing ten-voice sound budget.
+
+### Verification for 1.9.0
+
+* `npm test`: 68 behavior checks pass, including ten new destruction physics checks, actual recovery HUD handling, wreck engine muting and masonry audio dispatch. All five cars still complete legal Circuit races and physically escape Pursuit; a stopped driver is caught and busted.
+* `npm run check:model`: 25 real scene/geometry checks pass. All five complete intact triangle counts match their asset manifests. Local crumpling, template/rival isolation, actual panel detachment, glass shards, repair, body/camera transforms, debris caps and exactly-once resource disposal are checked. The GPU render call is replaced; this does not establish browser visuals or FPS.
+* `npm run check:world`: all 17 scenery exports, deterministic placements, clear driving corridor and five actual theme switches pass. Section coordinates match physics. Breaking hides the real matching instances and reset restores their original transforms. The three themes contain 1073/1072/1105 placements and 400/303/466 scenery draw batches respectively; visibility culling affects actual rendered draws.
+* `npm run check`: 22 runtime JavaScript modules parse; local imports, assets, UI bindings and hosting resolve. `git diff --check` is clean.
+* Three original prototypes were authored and exported with Blender 4.5.3's Python runtime: masonry barrier, chipped block and exposed crash frame. All 26 editable Blender scenes are included. The five accepted exterior car GLBs retain their original bytes and intact shape.
+* Eight Blender CPU renders use the actual prepared/deformed runtime meshes, comparing intact, front dent, front wreck and side wreck from two angles. The inspected contact sheet is `assets-src/wilderness/destruction-preview.jpg`. This caught and corrected radiator visibility after side damage and prompted smaller glazing shards. These are authored mesh visual checks, not browser screenshots.
+* Internet research inspected two vehicle/barrier crash images and eighteen samples across the first 54 seconds of a publisher BeamNG trailer, alongside primary mesh-splitting and physics guidance. This is sampled visual research; no claim of every frame or audible review is made. No reference media or commercial mesh/audio is shipped.
+
+Browser GPU rendering, shader compilation, audible balance, physical controllers and actual FPS remain hardware checks. Supported browser preview is unavailable and the prior cloud browser reported WebGL Disabled. This is bounded arcade deformation and fracture, without a full soft body chassis, tire detachment or gameplay collision with loose debris. Destruction adds temporary draw and memory cost; the caps bound work but do not prove FPS.
 
 ## Collision feedback, 1.8.0
 

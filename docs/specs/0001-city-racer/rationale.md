@@ -85,3 +85,12 @@ Two retrieved images were directly inspected for long warm spark streaks, small 
 Original waveform synthesis combines a short low body impulse, broadband crunch, decaying panel frequencies and a scattered high fragment tail. Looping gritty noise gives sustained scraping a distinct sound. No commercial recordings or imagery are included. The actual browser audio balance and GPU effect appearance remain unverified in this environment.
 
 References retrieved during research: https://store.steampowered.com/app/1328660/Need_for_Speed_Hot_Pursuit_Remastered/ , https://wall.alphacoders.com/big.php?i=642571 , https://www.rapidreviewsuk.com/need-for-speed-hot-pursuit-remastered-review/ .
+
+
+## Destruction references and implementation, 2026-10-12
+
+The authorized update needs persistent damaged material and real openings. The added layer derives damage from mass and normal closing energy, partitions the original triangle sets into detachable regions, and keeps owned deformed geometry per car. Smooth normals follow the deformation derivative; zero damage and recovery restore original geometry. This avoids changing the accepted intact silhouettes or shared templates. Broken glazing is subdivided into actual mesh shards, with no commercial mesh imports.
+
+BeamNG's primary mesh-splitting guide distinguishes detachable bumpers/hoods and broken glazing. Its physics page describes a fuller soft body system than this bounded arcade layer. Two crash/barrier images were inspected. The publisher Steam trailer supplied HLS segments: nineteen initialization/media segments were downloaded and decoded; eighteen samples across the first 54 seconds were inspected for airborne, bank and landing motion. This is sampled visual inspection, with no claim of every frame or audible evaluation. References: https://documentation.beamng.com/modding/vehicle/vehicle-art/final-mesh-splitting/ , https://www.beamng.com/game/about/physics/ , https://store.steampowered.com/app/284160/BeamNGdrive/ . Reference pixels and sounds are not shipped.
+
+Original masonry and chipped chunks were authored with Blender 4.5.3's Python runtime, along with an exposed chassis/radiator. The three new scenes and exports use existing credited surface maps. CPU renders of actual prepared/deformed meshes exposed an incorrect radiator visibility after side damage; it now appears only after front panels are removed. Windshields now shatter into smaller pieces. This render pass verifies geometry presentation, not browser GPU appearance.

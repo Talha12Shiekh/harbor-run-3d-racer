@@ -54,7 +54,7 @@ test('AC-43 AC-44 gravity, road bounce, pause, expiry and reduced motion have bo
  f.clear();assert.equal(f.recoils.size,0);
 });
 test('AC-45 original sound buffers are distinct, deterministic, finite and fade to silence',()=>{
- for(const rate of [22050,44100,48000])for(const kind of ['light','heavy','scrape']){const samples=impactSamples(rate,kind),same=impactSamples(rate,kind);assert.deepEqual(samples,same);assert.equal(Math.abs(samples[0]),0);assert.ok(samples.every(v=>Number.isFinite(v)&&Math.abs(v)<=.901));assert.ok(samples.some(v=>Math.abs(v)>.1));assert.ok(Math.abs(samples.at(-1))<.004);}
+ for(const rate of [22050,44100,48000])for(const kind of ['light','heavy','masonry','scrape']){const samples=impactSamples(rate,kind),same=impactSamples(rate,kind);assert.deepEqual(samples,same);assert.equal(Math.abs(samples[0]),0);assert.ok(samples.every(v=>Number.isFinite(v)&&Math.abs(v)<=.901));assert.ok(samples.some(v=>Math.abs(v)>.1));assert.ok(Math.abs(samples.at(-1))<.004);}
  assert.ok(impactSamples(48000,'heavy').length>impactSamples(48000,'light').length);
 });
 
@@ -69,4 +69,7 @@ test('AC-45 impact audio follows severity, camera stereo position, distance and 
 });
 test('AC-45 scraping sustains one loop, fades without contact and cannot play while inactive',async()=>{
  globalThis.window={AudioContext:Context};const s=new Sound(),p=car(0,0);await s.resume();s.contacts([event(.6,'scrape')],p);assert.equal(s.scrape.level,0);s.update(p,true);s.contacts([event(.6,'scrape')],p);s.update(p,true);assert.ok(s.scrapeGain.gain.value>0);assert.equal(s.voices.size,0);const nodes=s.context.nodes.length;for(let i=0;i<20;i++)s.contacts([event(.6,'scrape')],p);assert.equal(s.context.nodes.length,nodes);s.context.currentTime=.2;s.update(p,true);assert.equal(s.scrapeGain.gain.value,0);s.clearContacts();assert.equal(s.scrape.level,0);
+});
+test('AC-51 broken masonry selects its own original rubble waveform',async()=>{
+ globalThis.window={AudioContext:Context};const s=new Sound(),p=car(0,0);await s.resume();s.update(p,true);s.contacts([{...event(1),broken:true,surface:'masonry'}],p);assert.equal([...s.voices].at(-1).source.buffer,s.impactBuffers.masonry);assert.notDeepEqual(impactSamples(48000,'masonry').slice(0,1000),impactSamples(48000,'heavy').slice(0,1000));
 });
