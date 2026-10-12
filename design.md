@@ -1,6 +1,6 @@
 # Harbor Run
 
-Current direction: the user authorized the 1.9.0 vehicle destruction and barrier breach update in docs/specs/0001-city-racer/index.md. The accepted 1.7.2 title and HUD composition remains. Earlier city/sedan choices remain historical rationale.
+Current direction: the user authorized the 1.9.1 driver briefing composition update in docs/specs/0001-city-racer/index.md. The accepted 1.7.2 title and HUD composition remains. Earlier city/sedan choices remain historical rationale.
 
 ## Character
 
@@ -68,3 +68,10 @@ Keep the open driving view and current HUD composition. Contact feedback belongs
 Keep intact vehicle silhouettes and the accepted scene composition. Real front/rear/side geometry crumples locally; trim and lamp housings follow that deformation. Panels detach from the original mesh, and shattered glazing splits into smaller pieces. Show the exposed frame and radiator when front panels are removed; a side hit must not put the radiator through an intact hood. Materials and geometry belong to each damaged car, while templates remain reusable.
 
 Masonry stretches share the existing route and instancing workflow. Damage leans and compresses the matching section; a broken section leaves a real opening with moving chipped blocks or steel pieces. Falling cars rotate around their body centre and land on the authored bank/height map. Cabin views inherit the same rotation and up vector. Exterior views preserve their selection. A small amber recovery line uses the existing unboxed HUD text treatment. R repairs the car, a new event restores barriers, and no offroad wreck can count a checkpoint or pursuit escape. Fixed debris caps and lifetimes bound resource use; rendered GPU performance remains a separate hardware check.
+
+
+## Driver briefing
+
+The optional first visit guide uses the accepted car artwork with the full vehicle visible in a wider cinematic art area. A local Harbor Run wordmark anchors the upper art edge; the lower caption names daylight to midnight driving. Soft image fades merge into the navy scene. The right content is bounded and centered, with an amber briefing label, a strong two line headline, one concise introductory sentence and six numbered control groups in two columns. Short desktop screens use a single headline line and tighter spacing while retaining readable labels.
+
+Control groups use light top dividers and faint surface gradients rather than broad filled rectangles. Key badges use Barlow with subtle outlines. Continue and Skip sit together below the guide; the primary action has a bounded width and Skip is a quiet text action. Cyan keyboard focus remains visible. Narrow screens keep a car banner, and the smallest screens stack the groups and actions with natural scrolling. The source image, copy, control bindings and both completion handlers remain local. The screenshot diagnoses the old layout; it is not the visual target to reproduce. Briefing tokens in dist/style.css are authoritative.

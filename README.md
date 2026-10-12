@@ -1,4 +1,4 @@
-# Harbor Run 1.9.0
+# Harbor Run 1.9.1
 
 An original 3D arcade racer with five Blender authored vehicles, daylight forest/alpine scenery and a night forest setting inspired by the supplied Hot Pursuit footage. Circuit racing and police pursuits, four traffic cars, distinct handling, five driving cameras, an animated Blender cabin, contact sparks/debris/dust, impact recoil and layered collision audio, persistent body damage, breakable roadside barriers, falling and tumbling wrecks, nitrous, Speedbreaker, keyboard and standard gamepad controls. All current vehicle and scenery geometry is authored for this project; the earlier downloaded sedan and city assets have been retired.
 
@@ -12,6 +12,8 @@ python3 -m http.server 8080
 ```
 
 Open http://localhost:8080 in a desktop browser with WebGL and hardware acceleration. File URLs cannot load the module/asset workflow. All assets are local; there are no runtime CDN requests. The shipped runtime is approximately 42 MB; cache and unused textures affect actual transfer.
+
+The optional driver briefing now pairs a full view of the original car artwork with a compact six group control guide. Light dividers, readable key badges and side by side Continue/Skip actions replace the broad filled cards and stacked full width buttons. Short desktop screens retain the complete guide; narrow screens use a car banner and natural scrolling. Arrow key and gamepad navigation still use the real menu handlers.
 
 Enter the garage from the cinematic title. The optional first visit briefing can be skipped or reopened later. Choose Apex H1 (hypercar), Strada S2 (open spyder), Sentinel I3 (interceptor), Kestrel R4 (rally sedan) or Vanguard M5 (muscle coupe). Labelled thumbnail buttons choose the body. Up/Down move between groups; Left/Right choose within the group; Enter activates the focused action. All desktop choices fit together at 1100 × 600 and larger. Smaller screens retain scrolling. Scene cards choose Redwood Ridge, Summit Pass or Midnight Run. Choose paint, inspect front/rear/both sides/angled/orbit camera views and start. Car changes apply that body's default finish; subsequent paint choices are independent. Existing valid settings and best times survive.
 

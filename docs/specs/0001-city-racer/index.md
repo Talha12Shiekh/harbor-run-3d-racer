@@ -1,6 +1,6 @@
 # 0001 City racer
 
-**Status**: Implemented, 1.9.0 vehicle destruction and barrier breaches; browser and audible checks remain open in BUILD-REPORT.md
+**Status**: Implemented, 1.9.1 driver briefing composition; browser and audible checks remain open in BUILD-REPORT.md
 **Date**: 2026-10-11
 **Authorized by**: User, Accept and build, then proceed with all remaining steps.
 
@@ -399,3 +399,34 @@ Damage changes vehicle motion and the possibility of leaving the course, so race
 BeamNG's primary mesh splitting guidance explains separate meshes for detachable bumpers, hoods and damaged glazing: https://documentation.beamng.com/modding/vehicle/vehicle-art/final-mesh-splitting/ . Its physics page is a reference for stronger destruction behavior: https://www.beamng.com/game/about/physics/ . Two crash images were retrieved and inspected for crumpling, glazing and barrier deformation. Eighteen samples from the first 54 seconds of a publisher trailer were inspected for airborne and landing motion: https://store.steampowered.com/app/284160/BeamNGdrive/ . This is sampled visual research, not a claim of inspecting every frame or hearing all playback audio. No commercial imagery, model or sound is shipped.
 
 Verification and limitations for this implementation are recorded in BUILD-REPORT.md. Publishing and source synchronization are confirmed by the native delivery results, separately from local checks.
+
+
+## Driver briefing composition, authorized 2026-10-12
+
+### Summary and requirements
+The supplied screenshot shows a narrow cropped car image beside broad filled control cards and two full width stacked actions. Refine this existing optional briefing within the current Harbor Run visual system. The build approach is one complete screen, from its real content and actions through responsive presentation and verification.
+
+AC-53: Give the original car artwork a balanced cinematic presentation, showing the whole car rather than its heavily cropped front. Retain local Harbor Run branding, amber accent, Barlow body text and Barlow Condensed display type. Compose a distinct art area and a bounded instruction area with deliberate spacing, a clear headline and concise introductory copy.
+AC-54: Keep all six existing shortcut groups visible together on desktop screens of 1100 by 600 and larger. Present them as two columns with light dividers, small numbered accents, readable key badges and restrained surface shading. Continue and Skip share a compact action row, with at least 44 pixel targets and clear cyan focus. Smaller screens show the image as a banner and scroll naturally; the smallest screens use one control column. Short desktop screens compact spacing without hiding instructions.
+AC-55: Preserve the existing optional briefing, persistence, revisit behavior and Continue/Skip handlers. Both actions enter the garage without starting a race. Arrow keys, Enter and standard gamepad actions keep their current behavior. The title, garage, driving HUD, simulation, models and other scenes keep their current styling and logic. Verify real menu handlers, assets, CSS structure and layout budgets, then publish the same Site and update the same GitHub repository and source ZIP. Record unavailable browser rendering separately.
+
+### Decision and value sources
+Refine the HTML and CSS in place. Replacing the onboarding flow or adding new artwork would increase delivery and input risk for a composition problem. All keyboard and gamepad labels come from the existing mappings in dist/app.js and existing briefing content. The original image is dist/assets/ui/title-v2.jpg, inspected before setting its crop. Its car spans approximately 30 to 94 percent of the image width. On desktop the image is 145 percent of the art area width, offset 40 percent left, so the full vehicle fits in that area. A soft vertical mask and side fade blend the scenery into the existing navy background.
+
+The art area is 44 percent on wide desktop, 40 percent below 1500 pixels and 33 percent below 1280 pixels. Instruction content caps at 780 pixels. Headline uses two lines on tall desktop and one line below 760 pixels high. The control grid retains two columns down to 640 pixels, then becomes one column. Below 1024 pixels the image becomes a 220 pixel banner above the content. Type, spacing, dividers and key surfaces are scoped to the briefing in dist/style.css. Action width derives from the available action row with a 300 pixel primary cap. No settings or data migration is needed.
+
+| Display or action | Source |
+| --- | --- |
+| Wordmark, headline and introductory copy | Existing Harbor Run identity and the screen copy recorded in dist/index.html |
+| Car image and crop | Existing title-v2.jpg and its directly inspected vehicle bounds |
+| Six shortcut groups | Actual keyboard and gamepad mappings in dist/app.js |
+| Continue, Skip and persisted completion | Existing continueBriefing, skipBriefing and completeBriefing handlers |
+| Keyboard selection and focus | Existing menuGroups, focusMove and native focused buttons |
+| Typography, spacing and color | Current local fonts and scoped briefing tokens in dist/style.css |
+
+### Build plan
+- [x] AC-53, AC-54: Refine the briefing markup and replace its superseded CSS rules with one scoped responsive composition.
+- [x] AC-54, AC-55: Verify control readability, menu actions and layout budgets, then deliver the matching published source.
+
+### Consequences
+This improves visual balance without a new image request or runtime dependency. Font metrics and box budgets support the fit check but cannot prove a browser render. Browser verification follows the existing supported Sites preview constraint. The supplied screenshot is problem evidence, not shipped artwork.

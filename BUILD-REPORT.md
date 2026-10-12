@@ -1,6 +1,25 @@
-# Harbor Run 1.9.0 verification report
+# Harbor Run 1.9.1 verification report
 
 Date: 2026-10-12.
+
+## Driver briefing composition, 1.9.1
+
+The supplied 1915 by 907 screenshot shows a narrow cropped car and six broad filled cards, followed by two oversized stacked actions. The briefing now gives the artwork 44 percent of the wide desktop, with a measured crop that contains the complete vehicle. A restrained wordmark and lower caption anchor the art. The instruction area caps at 780 pixels, with a clear headline, short introductory sentence and six light control groups in two columns. Hairline dividers and subtle shading replace the dense filled rectangles. Continue and Skip share one compact action row, with a 300 pixel primary button, quiet Skip treatment and cyan keyboard focus.
+
+Below 1500/1280 pixels the art share contracts to 40/33 percent to preserve room for the guide. Short desktop screens use one headline line and smaller gaps. Below 1024 pixels the artwork remains as a 220 pixel banner. Below 640 pixels the guide becomes one column; the smallest displays stack actions and scroll naturally. Supporting control type remains 14 pixels, and action targets remain at least 44 pixels. All six groups retain their actual shortcuts. Recovery copy now explains the existing repair behavior.
+
+Superseded briefing selectors were removed, retaining the other selectors in shared rules. A comparison verifies that HTML outside the briefing is identical to 1.9.0 and every nonbriefing CSS rule retains its declarations. The only JavaScript change is the exposed release version. The optional flow, completion persistence, revisit, Continue/Skip handlers, game simulation and original assets remain.
+
+### Verification for 1.9.1
+
+* Sixteen existing menu/input/profile checks pass, covering first visit, skip, returning profiles, revisit, Enter/gamepad flow, camera selection and recovery. No new behavior or test framework was added for this visual change.
+* All 22 runtime JavaScript modules parse; local imports, assets, UI IDs and hosting resolve. CSS braces are balanced and `git diff --check` passes.
+* Actual local Barlow font measurements put the widest shortcut row at 223.2 pixels. Available group text width is 276.3 pixels at 1100 by 600, 286.0 at 1280 by 720, 328.9 at 1440 by 900, and 333.0 at the supplied screenshot size. The primary label plus padding/arrow allowance is 239.8 pixels within its 300 pixel cap.
+* Conservative composition budgets estimate 560.8 pixels of content at 1100 by 600 and 1280 by 720, 740.0 at 1440 by 900, and 758.1 at 1915 by 907. These support fit and readability but are not browser layout measurements. Narrow layouts retain overflow scrolling.
+* Scoped foregrounds pass numerical contrast checks against the guide, key and action surfaces; the cyan focus ring sits outside the amber button over the navy background. This is a color calculation, not rendered contrast measurement.
+* Artwork dimensions and the vehicle bounds were directly inspected. The same original local image is used; no commercial imagery, downloaded graphics or new runtime dependency was introduced.
+
+A supported control-browser skill is unavailable in this managed environment, so no preview server or alternative browser route was used. Actual rendered responsive appearance remains unverified here. The supplied screenshot and font/box checks support the design but cannot establish the final browser rendering.
 
 ## Vehicle destruction and roadside breaches, 1.9.0
 
