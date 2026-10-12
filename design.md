@@ -1,6 +1,6 @@
 # Harbor Run
 
-Current direction: the user authorized 1.7.0 driving cameras and onboarding section in docs/specs/0001-city-racer/index.md. Earlier city/sedan choices remain historical rationale.
+Current direction: the user authorized 1.7.1 text and control readability section in docs/specs/0001-city-racer/index.md. Earlier city/sedan choices remain historical rationale.
 
 ## Character
 
@@ -8,7 +8,7 @@ Forest highway and snowy mountain racing: detailed conifers, rock banks, layered
 
 ## Composition
 
-Keep the amber Harbor Run wordmark, restrained instruments and dark garage panel over the real 3D scene. Top to bottom: route context, two-line heading, concise race copy, lap/racer/length facts, compact event, car and setting cards, paint row, primary start action, controls/settings/credits, records footer. The right-hand vehicle caption follows the selected body. Explicit 44 px car image heights replace the stretched 330 px HTML heights. At 1100 × 600 and larger, the header, choice groups, Start and footer fit one view. Smaller screens retain scrolling.
+Keep the amber Harbor Run wordmark, restrained instruments and dark garage panel over the real 3D scene. Top to bottom: route context, two-line heading, concise race copy, lap/racer/length facts, compact event, car and setting cards, paint row, primary start action, controls/settings/credits, records footer. The right-hand vehicle caption follows the selected body. Explicit compact car image heights replace the stretched 330 px HTML heights. At 1100 × 600 and larger, the header, choice groups, Start and footer fit one view. Smaller screens retain scrolling.
 
 Racing fills the viewport. Position/lap are top left, time top right, map bottom left, speed and resource meters bottom right. Loading, error, pause and results retain complete existing overlays. Selectors apply in the garage and persist with validated settings.
 
@@ -45,3 +45,11 @@ Chase, Wide chase, front three quarter Tracking, Hood and Cockpit share the real
 The opaque exterior roof crossed the first driver projection. Split its painted triangles into a separately visible group at load time, without changing the original GLBs, total exterior geometry or silhouette. In Cockpit only, hide that group, the old leather cabin and glazing, and show the detailed interior. Restore them on switching away or holding rear view. Snap interior mode changes to avoid travel through the body. Shared cabin resources survive restarts; no mirror pass is added.
 
 The desktop VIEW toolbar sits above the HUD help row. The briefing displays six control cards together. Local condensed display fonts, clear selection state and cyan keyboard focus apply throughout title, briefing, garage, pause and results. Native dialog fields retain native arrow behavior, and focus returns to the opening action. Held menu controls must release before they can drive the car.
+
+## Readable controls and copy
+
+The HUD groups camera, tracking angle, R reset, C rear view and Escape pause in one dark dock with clear key badges. Body and action text use Barlow; condensed type stays on headings and large instruments. Position, time, map, speed/resources and pursuit information have their own dark backing surfaces. Small labels have readable sizes without scaling the whole panel down. Narrow displays wrap the dock and use smaller instrument geometry while retaining text size.
+
+Pause, results, error, controls, settings and credits have explicit bright text. Secondary and return actions are filled buttons, with the existing amber primary action retained. Title copy and its edition/footer labels have local backing surfaces so the bright car art remains visible while text stays clear. Garage captions and help labels are larger; desktop geometry is compact, with scrolling retained on smaller displays.
+
+Token values are authoritative in dist/style.css. The color calculation compares the actual foregrounds and surfaces, including translucent HUD backing over white. It cannot prove rendered geometry or appearance. The last cloud browser attempt reported its graphics renderer as Disabled.

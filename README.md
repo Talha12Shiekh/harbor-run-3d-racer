@@ -1,4 +1,4 @@
-# Harbor Run 1.7.0
+# Harbor Run 1.7.1
 
 An original 3D arcade racer with five Blender authored vehicles, daylight forest/alpine scenery and a night forest setting inspired by the supplied Hot Pursuit footage. Circuit racing and police pursuits, four traffic cars, distinct handling, five driving cameras, an animated Blender cabin, nitrous, Speedbreaker, keyboard and standard gamepad controls. All current vehicle and scenery geometry is authored for this project; the earlier downloaded sedan and city assets have been retired.
 
@@ -24,6 +24,8 @@ Auto graphics responds to sustained frame rate by changing resolution within a .
 During either event, V, gamepad LB or the VIEW button cycles Chase, Wide chase, Tracking, Hood and Cockpit. Tracking starts at a front three quarter angle; hold brackets or use its angle buttons to circle the car. Cockpit shows a real 3D wheel, stitched dash, vents, console and moving instrument needles. The open spyder omits the roof header. C/RB temporarily looks behind, then restores the selected camera.
 
 Car, event, scenery, paint, driving view, tracking angle, briefing completion, graphics, sound, stats display and valid records persist in browser localStorage when available.
+
+The readability update groups camera, reset, rear view and pause into a dark HUD dock with clear key badges. Race instruments have dark backing panels and larger labels. Pause, results, settings, controls and credits use brighter copy and stronger action buttons. Title and garage text also have improved backing and sizing. Existing keyboard/gamepad actions and saved profiles are retained.
 
 ## Controls and rules
 

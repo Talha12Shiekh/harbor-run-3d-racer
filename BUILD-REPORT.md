@@ -1,6 +1,25 @@
-# Harbor Run 1.7.0 verification report
+# Harbor Run 1.7.1 verification report
 
-Date: 2026-10-11.
+Date: 2026-10-12.
+
+## Readability update
+
+The supplied Alpine HUD screenshot showed 8 to 10 pixel supporting labels directly over bright scenery. Camera, R reset, C rear view and pause now share one dark dock with visible key badges. Circuit/Pursuit status, time, map and speed/resources have their own backing panels. Small displays change the instrument geometry instead of scaling down the whole panel and its text. Action labels are 14 pixels on desktop and 13 pixels on the smallest displays. HUD supporting labels are at least 12 pixels.
+
+The supplied pause screenshot showed small muted secondary actions. Pause, results and error use 16 pixel body/action text and bright foregrounds. Restart and return actions now have filled button surfaces. Controls references use 14 to 15 pixel text; settings labels/selects and credits use 16 pixels. Title copy and edition/footer labels have backing surfaces. Garage labels and captions are larger while retaining compact desktop geometry and smaller-screen scrolling.
+
+The original local fonts, artwork, models, physics, input mappings, camera selection and storage behavior are retained. The HTML preserves existing action IDs; only the HUD grouping and key badge markup change. No dependency, additional image or model was added.
+
+### Verification for 1.7.1
+
+* `node --test tests/menu-flow.test.mjs`: all 11 actual app handler tests pass. This includes menu arrows, gamepad direction edges/neutral release, camera cycling, held rear restoration, angle adjustment, native dialog input and profile restoration. It is a DOM fixture, not a rendered browser.
+* `npm run check`: all 16 JavaScript modules parse; UI IDs, local imports, images/fonts/GLBs and hosting configuration resolve.
+* Ten color calculations read the actual final CSS tokens. The lowest tested normal-text contrast is 7.77, above this enhancement's 4.5 target. The translucent HUD is tested over white as the brightest backing case. Main dialog text is 16.49; supporting dialog copy is 12.73; button labels are 12.24; HUD supporting text over white is 12.75. These calculations do not certify the whole interface or establish layout.
+* CSS delimiter and custom property reference checks pass. The standalone CSS parsers were unavailable, so this is lexical verification, not browser CSS evaluation.
+* Local font metrics caught a title wordmark that would exceed the padded card width. The title now uses a capped size with smaller sizes on short/narrow displays. Garage cards reserve space for the larger caption line, rather than clipping it beneath the image.
+* `git diff --check`: clean. Existing car/scenery GLBs and all 23 editable Blender scenes are unchanged.
+
+The prior 1.7.0 behavioral and scene evidence below is retained. The following 43 and 18 test totals were last rerun before this typography update; the targeted 11 handler checks above were rerun for this update.
 
 ## Driving cameras and onboarding
 
@@ -58,7 +77,7 @@ Baseline and final measurements are in docs/specs/0001-city-racer/performance.js
 * `npm run check:model`: 18 actual scene tests plus all five GLB assertions. Actual chase projection at four headings, wheel steering from physics, active/inactive patrol meshes/lights, Auto shadows/resolution, grounding, finite transforms, hood lamp clearance, paint/brake isolation, restart ownership, night headlights, garage views and a complete legal Circuit are covered. Three added checks cover every driving preset on all five bodies at four headings, clear forward rays and visible controls in all five cabins, actual wheel/needle animation, held rear restoration, reduced motion and shared resources after restart. The GPU render call is replaced.
 * `npm run check:world`: fourteen scenery/road/lamp GLBs retain finite geometry and expected materials/bounds/triangle totals. Three placement sets stay clear and grounded. Spatial batches retain every instance and triangle with limited bounds. Five actual theme switches preserve sky/reflections/light restoration and shared assets.
 * `npm run check`: 16 modules parse; imports, UI IDs, vehicle/scenery/font/image assets and hosting configuration resolve.
-* `git diff --check`: clean. Static runtime is 39,310,856 bytes (37.5 MiB), including the new local cabin and title artwork. No new dependencies or remote runtime requests were added.
+* `git diff --check`: clean. The 1.7.0 runtime was 39,310,856 bytes (37.5 MiB), including the local cabin and title artwork. The current readability patch changes HTML/CSS and the version label only. No new dependencies or remote runtime requests were added.
 
 The DOM fixture executes actual handlers and simulation but does not render browser layout. Audio fixtures verify parameters and muting, not audible quality.
 
@@ -78,7 +97,7 @@ Widths include mirrors. Five vehicle scenes, fourteen prototypes and three compo
 
 ## Browser checks still open
 
-Supported control-browser preview is unavailable in this managed workspace. Browser GPU shading, texture upload, transparency sorting, responsive menu appearance, physical gamepads, audible siren balance and FPS remain unverified. Node timings, camera geometry and fixtures cannot establish those outcomes.
+Supported control-browser preview is unavailable in this managed workspace. The preceding explicit cloud browser attempt loaded the live game but reported GL_VENDOR and GL_RENDERER as Disabled, and displayed the WebGL startup error. Browser GPU shading, texture upload, transparency sorting, responsive menu appearance, physical gamepads, audible siren balance and FPS remain unverified. Node timings, camera geometry and fixtures cannot establish those outcomes.
 
 For hardware verification, select each car and scene, drive left/right and reverse, try both events, use pause/recovery/restart, and switch High/Reduced/Auto with the FPS overlay enabled. Check all five camera presets, bracket rotation, held rear restoration, front/rear/side garage inspection, night road visibility, arrow-key focus/choices and one-view garage/briefing fit at 1363 × 652, 1100 × 600 and a smaller display. Check native dialogs and held gamepad menu input before accelerating. Compare frame rate on the same route before judging GPU performance.
 

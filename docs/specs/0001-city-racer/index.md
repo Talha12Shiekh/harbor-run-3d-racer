@@ -1,6 +1,6 @@
 # 0001 City racer
 
-**Status**: Implemented, 1.7.0; browser checks remain open in BUILD-REPORT.md
+**Status**: Implemented, 1.7.1; browser checks remain open in BUILD-REPORT.md
 **Date**: 2026-10-11
 **Authorized by**: User, Accept and build, then proceed with all remaining steps.
 
@@ -269,3 +269,37 @@ Seat positions may be tuned against the real exported surfaces and authored prev
 Front tracking is a cinematic view of the car and road behind it. Chase, hood and cockpit show the next turn. The shared dashboard has different seat placement by body; mirrors and driver arms are not included. Generated title art is a marketing image, not a browser screenshot. Browser appearance and physical controllers remain open when supported preview is unavailable.
 
 The four supplied screenshots are the direct visual references. EA's Heat guide documents separate camera toggle and look controls: https://www.ea.com/able/resources/need-for-speed/need-for-speed-heat/pc/control-settings . EA's SHIFT manual describes outside and in helmet perspectives: https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/24870/manuals/NFSSHpcMAN(US).pdf?t=1759355309 . These inform independent choices; no commercial reference imagery or geometry is shipped.
+
+## Text and control readability, 2026-10-12
+
+### Summary and requirements
+Driving controls must stay clear over snow, bright asphalt and night scenery. Your supplied HUD image shows small grey labels against a bright road. The pause image shows weak secondary action labels. This enhancement increases text size and gives the information its own dark surfaces.
+
+AC-36: Group the camera selector, tracking angle controls, reset hint, rear view hint and pause action into one dark control dock. Keep every button at least 44 pixels high. Use visible keyboard badges and 14 pixel action labels on desktop, with 13 pixel labels on smaller displays. The selected camera name still comes from the validated camera catalog.
+AC-37: Give Circuit status, event time, map, speed/resources and Pursuit status dark backing surfaces. HUD labels are at least 12 pixels before any viewport adjustment, with no whole panel scaling that also shrinks text. Countdown and wrong way text have backing surfaces only while displayed. Layout adapts around the dock rather than overlapping its controls.
+AC-38: Pause, results, error and details dialogs use explicit bright foregrounds, 16 pixel body copy and 16 pixel action labels. Secondary and return actions have visible filled button surfaces. Controls references use at least 14 pixel text. Native labels, focus indicators and scrolling remain available.
+AC-39: Title, briefing and garage retain the existing artwork and typefaces while increasing supporting copy and selection labels. Keep the desktop garage compact at 1100 by 600 and larger. Smaller screens may scroll instead of shrinking essential text. Aim for at least 4.5 contrast between normal text and its backing surface, including a translucent HUD surface composited over white.
+AC-40: Preserve the existing input, camera, event and storage behavior. Confirm the actual menu handlers and source/asset checks. Publish the existing public Site and replace the same complete source ZIP. Document browser limits separately from numerical color checks.
+
+### Decision and value sources
+Fix the existing HTML and CSS in place. Shared readable foregrounds and dark backing surfaces solve the observed problem without replacing the accepted scene or UI. Replacing the whole HUD would need much broader layout and input changes. Increasing text alone would still leave labels exposed to bright scenery.
+
+The existing local Barlow font is used for action and body text. Barlow Condensed remains the display face for headings and large instruments. Main text is #f6faff, supporting text #d2dfe9, and the key/accent color #ffd166. HUD backing is #08121ef5, dialog backing #0d1c29, and button backing #1d3448. These values and component sizes live in dist/style.css. The contrast check reads those actual tokens and compares their computed lightness, including the HUD over a white background.
+
+| Value displayed | Source |
+| --- | --- |
+| Camera name and shortcut | Existing camera catalog and V input mapping |
+| Reset, rear and pause badges | Existing R, C and Escape input mapping |
+| Race and pursuit numbers | Existing real HUD simulation values |
+| Dialog and scene copy | Existing labelled HTML content |
+| Font, size, foreground and backing | The readability tokens and component rules in dist/style.css |
+
+No new provider, dependency, artwork, saved preference or data migration is needed. Keep existing element IDs and action handlers. Dark surfaces cover more of the scenery at the screen edges, which is the necessary tradeoff for reliable text contrast. Use the current end to end build approach, one HUD slice followed by the remaining screens.
+
+### Build plan
+- [x] AC-36, AC-37: Integrate the readable control dock and backed HUD instruments.
+- [x] AC-38, AC-39: Apply readable text and action styling to the remaining screens while retaining compact layout rules.
+- [x] AC-39, AC-40: Measure token contrast, check interactions and assets, document evidence, then deliver the published build and matching source.
+
+### Verification limits
+The current cloud browser reported GL_VENDOR and GL_RENDERER as Disabled during the preceding check, so it could not initialize WebGL. Numerical contrast and DOM fixture tests do not prove rendered layout, GPU appearance, physical controller response or audible quality. These browser checks remain open.
