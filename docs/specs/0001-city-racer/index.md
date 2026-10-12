@@ -1,6 +1,6 @@
 # 0001 City racer
 
-**Status**: Implemented, 1.7.1; browser checks remain open in BUILD-REPORT.md
+**Status**: Implemented, 1.7.2 title and HUD composition; browser checks remain open in BUILD-REPORT.md
 **Date**: 2026-10-11
 **Authorized by**: User, Accept and build, then proceed with all remaining steps.
 
@@ -273,18 +273,18 @@ The four supplied screenshots are the direct visual references. EA's Heat guide 
 ## Text and control readability, 2026-10-12
 
 ### Summary and requirements
-Driving controls must stay clear over snow, bright asphalt and night scenery. Your supplied HUD image shows small grey labels against a bright road. The pause image shows weak secondary action labels. This enhancement increases text size and gives the information its own dark surfaces.
+Driving controls must stay clear over snow, bright asphalt and night scenery. The first readability update improved text size, but your latest screenshots show that its nearly opaque title card and instrument rectangles cover the car and road. This revision retains the readable typography while integrating the information into the scene. Pause and detail dialogs retain their larger text and intentional panel surfaces.
 
-AC-36: Group the camera selector, tracking angle controls, reset hint, rear view hint and pause action into one dark control dock. Keep every button at least 44 pixels high. Use visible keyboard badges and 14 pixel action labels on desktop, with 13 pixel labels on smaller displays. The selected camera name still comes from the validated camera catalog.
-AC-37: Give Circuit status, event time, map, speed/resources and Pursuit status dark backing surfaces. HUD labels are at least 12 pixels before any viewport adjustment, with no whole panel scaling that also shrinks text. Countdown and wrong way text have backing surfaces only while displayed. Layout adapts around the dock rather than overlapping its controls.
+AC-36: Group the camera selector, tracking angle controls, reset hint, rear view hint and pause action into one lightweight prompt row over a continuous bottom edge fade. Remove the enclosing opaque rectangle. Keep every button at least 44 pixels high, visible focus and hover states, outlined keyboard badges and 14 pixel action labels on desktop, with 13 pixel labels on smaller displays. The selected camera name still comes from the validated camera catalog.
+AC-37: Present Circuit status, event time, map, speed/resources and Pursuit status as freestanding instruments over feathered corner shading. Remove widget rectangles, panel borders and large shadows. Retain the speed arc and thin resource meters; use a brighter map route with a dark stroke underneath. HUD labels are at least 12 pixels, without scaling entire panels. Countdown and wrong way use strong typography and shadow rather than boxes. Adapt geometry around the prompt row, leaving the central car and road open.
 AC-38: Pause, results, error and details dialogs use explicit bright foregrounds, 16 pixel body copy and 16 pixel action labels. Secondary and return actions have visible filled button surfaces. Controls references use at least 14 pixel text. Native labels, focus indicators and scrolling remain available.
-AC-39: Title, briefing and garage retain the existing artwork and typefaces while increasing supporting copy and selection labels. Keep the desktop garage compact at 1100 by 600 and larger. On short wide desktops, the briefing uses a single-line heading/intro and tighter card spacing to keep its six cards together, retaining 14 pixel control text. Smaller screens may scroll instead of shrinking essential text. Aim for at least 4.5 contrast between normal text and its backing surface, including a translucent HUD surface composited over white.
-AC-40: Preserve the existing input, camera, event and storage behavior. Confirm the actual menu handlers and source/asset checks. Publish the existing public Site and replace the same complete source ZIP. Document browser limits separately from numerical color checks.
+AC-39: The title retains its original bright car artwork and local typefaces. Set the wordmark, short copy and primary action directly in the left space, with no card behind them and no boxed edition/footer labels. Use a smooth scene gradient for contrast; keep the right side of the car bright. On narrow displays give the artwork the upper portion and place copy lower over a bottom fade. Retain compact desktop garage and briefing layout, readable text and scrolling on smaller displays. Contrast calculations are supporting evidence and do not prove rendered layout.
+AC-40: Preserve existing input, camera, event and storage behavior. Confirm actual menu handlers and source/asset checks. Publish the existing public Site, sync changed source to the authenticated GitHub repository while preserving its history, and replace the same complete source ZIP. Document browser limits separately from numerical color and layout checks.
 
 ### Decision and value sources
-Fix the existing HTML and CSS in place. Shared readable foregrounds and dark backing surfaces solve the observed problem without replacing the accepted scene or UI. Replacing the whole HUD would need much broader layout and input changes. Increasing text alone would still leave labels exposed to bright scenery.
+Fix the existing CSS and map presentation in place. Continuous edge shading, clear type and instrument geometry address the visual weight visible in your screenshots. Making the earlier panels slightly transparent would be simpler, but their rectangular footprints would remain. Replacing the whole HUD with a separate renderer would permit more animation, but would add input, resize and accessibility work without improving this focused composition change.
 
-The existing local Barlow font is used for action and body text. Barlow Condensed remains the display face for headings and large instruments. Main text is #f6faff, supporting text #d2dfe9, and the key/accent color #ffd166. HUD backing is #08121ef5, dialog backing #0d1c29, and button backing #1d3448. These values and component sizes live in dist/style.css. The contrast check reads those actual tokens and compares their computed lightness, including the HUD over a white background.
+The existing local Barlow font is used for action and body text. Barlow Condensed remains the display face for headings and large instruments. Existing bright white, amber and cyan tokens remain. New scene fades, text shadow and subtle key outlines derive from that palette in dist/style.css. The desktop title copy is 340 pixels wide, the wordmark caps at 118 pixels and shrinks on short displays. Desktop map geometry is 200 by 173 pixels; the speed arc is 230 pixels wide in a 230 by 276 instrument area. Desktop corners use a 28 pixel inset, with a 12 pixel inset on smaller displays. These sizes and their responsive variants are authoritative in CSS. The map route and marker colors are authoritative in drawMap in dist/app.js.
 
 | Value displayed | Source |
 | --- | --- |
@@ -292,14 +292,17 @@ The existing local Barlow font is used for action and body text. Barlow Condense
 | Reset, rear and pause badges | Existing R, C and Escape input mapping |
 | Race and pursuit numbers | Existing real HUD simulation values |
 | Dialog and scene copy | Existing labelled HTML content |
-| Font, size, foreground and backing | The readability tokens and component rules in dist/style.css |
+| Font, size, foreground and scene shading | The readability and scene composition tokens and component rules in dist/style.css |
 
-No new provider, dependency, artwork, saved preference or data migration is needed. Keep existing element IDs and action handlers. Dark surfaces cover more of the scenery at the screen edges, which is the necessary tradeoff for reliable text contrast. Use the current end to end build approach, one HUD slice followed by the remaining screens.
+No new provider, dependency, artwork, saved preference or data migration is needed. Keep existing element IDs and action handlers. Scene fades still darken the outer edges slightly, but do not create opaque cards over the accepted artwork and road. Use the existing end to end approach, integrating title and HUD presentation with real values before validation and publication.
 
 ### Build plan
-- [x] AC-36, AC-37: Integrate the readable control dock and backed HUD instruments.
-- [x] AC-38, AC-39: Apply readable text and action styling to the remaining screens while retaining compact layout rules.
-- [x] AC-39, AC-40: Measure token contrast, check interactions and assets, document evidence, then deliver the published build and matching source.
+- [x] AC-36, AC-37: Integrate lighter prompt and instrument presentation with the real camera and event values.
+- [x] AC-38, AC-39: Refine the title composition while preserving readable dialogs and compact menus.
+- [x] AC-39, AC-40: Check type dimensions, interactions and assets, document evidence, and prepare complete source for Site publication and GitHub synchronization.
+
+### Visual reference and rationale
+Your two screenshots from 2026-10-12 are the direct problem evidence. The official EA Hot Pursuit Remastered manual, page 7, shows the instrument hierarchy arranged around the driving view: event information above, map and equipment below left, and speed/resources below right. This informs the lighter perimeter composition; it is not a claim that the original game has this exact implementation. Reference: https://eaassets-a.akamaihd.net/eahelp/manuals/nfs-hp-remastered-pc-en.pdf . The original car artwork already in dist/assets/ui/title-v2.jpg remains the title image. No reference game imagery is shipped.
 
 ### Verification limits
 The current cloud browser reported GL_VENDOR and GL_RENDERER as Disabled during the preceding check, so it could not initialize WebGL. Numerical contrast and DOM fixture tests do not prove rendered layout, GPU appearance, physical controller response or audible quality. These browser checks remain open.

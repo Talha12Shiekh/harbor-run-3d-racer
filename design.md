@@ -1,6 +1,6 @@
 # Harbor Run
 
-Current direction: the user authorized 1.7.1 text and control readability section in docs/specs/0001-city-racer/index.md. Earlier city/sedan choices remain historical rationale.
+Current direction: the user authorized the 1.7.2 title and HUD composition revision in docs/specs/0001-city-racer/index.md. Earlier city/sedan choices remain historical rationale.
 
 ## Character
 
@@ -46,10 +46,14 @@ The opaque exterior roof crossed the first driver projection. Split its painted 
 
 The desktop VIEW toolbar sits above the HUD help row. The briefing displays six control cards together. Local condensed display fonts, clear selection state and cyan keyboard focus apply throughout title, briefing, garage, pause and results. Native dialog fields retain native arrow behavior, and focus returns to the opening action. Held menu controls must release before they can drive the car.
 
-## Readable controls and copy
+## Readable controls and scene composition
 
-The HUD groups camera, tracking angle, R reset, C rear view and Escape pause in one dark dock with clear key badges. Body and action text use Barlow; condensed type stays on headings and large instruments. Position, time, map, speed/resources and pursuit information have their own dark backing surfaces. Small labels have readable sizes without scaling the whole panel down. Narrow displays wrap the dock and use smaller instrument geometry while retaining text size.
+The HUD groups camera, tracking angle, R reset, C rear view and Escape pause in a light prompt row. Small outlined key badges, a camera indicator and fine dividers provide structure without an enclosing card. Body and action text use Barlow; condensed type stays on headings and large instruments. Position/time above and map/speed below float over continuous corner fades. The center stays open for the car and next bend. Countdown uses large amber type with a dark shadow. Small labels retain their readable size while narrower displays use smaller geometry and wrap prompts.
 
-Pause, results, error, controls, settings and credits have explicit bright text. Secondary and return actions are filled buttons, with the existing amber primary action retained. Title copy and its edition/footer labels have local backing surfaces so the bright car art remains visible while text stays clear. Garage captions and help labels are larger; desktop geometry is compact, with scrolling retained on smaller displays. On wide desktops 600 to 740 pixels tall, the briefing heading/intro share single lines and card margins tighten while control text remains 14 pixels.
+The title places the wordmark, concise copy and amber primary action directly in the left space. A smooth scene gradient supplies contrast with no title card. Edition and route labels are plain typography along the frame. The car remains the image focal point on the right. On narrow displays artwork occupies the upper portion and copy settles lower over a bottom fade. Pause, results, error, controls, settings and credits retain readable text and deliberate dialog surfaces. Garage captions and compact desktop geometry remain; smaller displays can scroll. Short wide briefing layouts retain six readable control cards together.
+
+## Build mandate
+
+Keep the accepted car art and driving scene dominant. Remove large rectangular backings from the title and racing instruments, without restoring tiny text. Retain the brand, real event values, readable control names, 44 pixel button targets and cyan keyboard focus. Hover and pressed states must be visible on the refined controls. Use smooth gradients and text shadows, not a new collection of panels. The title and driving HUD are the focused surfaces for this revision.
 
 Token values are authoritative in dist/style.css. The color calculation compares the actual foregrounds and surfaces, including translucent HUD backing over white. It cannot prove rendered geometry or appearance. The last cloud browser attempt reported its graphics renderer as Disabled.

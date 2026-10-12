@@ -1,6 +1,23 @@
-# Harbor Run 1.7.1 verification report
+# Harbor Run 1.7.2 verification report
 
 Date: 2026-10-12.
+
+## Title and HUD composition, 1.7.2
+
+The supplied title screenshot showed a nearly opaque rectangular card over the car. The wordmark, copy and primary action now sit directly in the left space, with smooth scene shading and plain frame labels. The title content is narrower, and the existing bright car image remains. On narrow screens the image occupies the upper portion and copy sits lower over a bottom fade.
+
+The supplied gameplay screenshot showed large rectangular backings around position, time, map, speed, countdown and control hints. Those rectangles are removed. Feathered edge shading, text shadows, a smaller speed arc with a soft radial wash, thin resource meters and a brighter outlined map route support the readable labels. The camera/recovery/rear/pause row has a small camera mark, outlined key badges and fine separators. Buttons retain 44 pixel targets and visible focus, hover and pressed states. Tracking angle buttons show directional arrows while retaining bracket shortcuts and existing handlers.
+
+The official EA Hot Pursuit Remastered manual, page 7, informed the perimeter instrument hierarchy. No commercial reference image is shipped. Physics, event state, view presets, settings, the original title artwork, all vehicle/scenery GLBs and 23 editable Blender scenes are retained. No dependencies were added.
+
+### Verification for 1.7.2
+
+* All 11 actual menu/input/camera handler tests pass in the DOM fixture. This verifies behavior, not rendered appearance.
+* Source and local asset checks pass. CSS delimiter/custom property checks and `git diff --check` pass.
+* Local font measurements put HARBOR at 333.1 pixels at the 118 pixel cap, below the 340 pixel title width. At the short desktop size it is 293.6 pixels, and at the narrow size it is 214.5 pixels. The two 16 pixel body lines are 261.1 and 260.4 pixels, within the narrow 300 pixel content area. These are font metrics, not browser layout measurements.
+* The optional performance readout moves below the event timer on smaller screens to avoid the new control row and lower instruments.
+
+The last cloud browser attempt reported its WebGL renderer as Disabled. Actual rendered appearance, including scene contrast and responsive fit, remains a browser check. The numerical contrast evidence for the preceding boxed 1.7.1 design below is historical and does not establish contrast for this new gradient design.
 
 ## Readability update
 

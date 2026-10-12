@@ -65,7 +65,7 @@
 .eyebrow{font-size:var(--small-text);letter-spacing:.12em}.quiet,.tip{font-size:15px;color:var(--muted)}
 .title-top,.title-bottom{font-size:var(--small-text);letter-spacing:.08em}.start-hint{font-size:var(--small-text);letter-spacing:.045em;line-height:1.5}
 .title-copy .eyebrow{font-size:13px}.title-copy p{font-size:19px}.title-copy .start-hint{font-size:13px}
-.title-copy{padding:20px;background:var(--hud-surface);border-left:3px solid var(--accent);border-radius:4px}.title-copy h1{font-size:clamp(76px,9vw,128px);line-height:.8;margin:22px 0}.title-top>span,.title-bottom>span{padding:7px 10px;background:var(--hud-surface);border:1px solid var(--line);border-radius:4px}
+.title-copy{padding:0;background:none;border:0;border-radius:0}.title-copy h1{font-size:clamp(76px,9vw,128px);line-height:.8;margin:22px 0}.title-top>span,.title-bottom>span{padding:0;background:none;border:0;border-radius:0}
 .briefing-copy>p{font-size:var(--body-text)}.briefing-steps p{font-size:var(--control-text);line-height:1.5}.briefing-steps kbd{font:700 var(--control-text) var(--font);background:var(--key-surface);color:var(--ink);padding:2px 5px;border-color:var(--line)}
 .menu-links button{font-size:var(--control-text);color:var(--ink);font-weight:600}.route-tag{font-size:var(--small-text);line-height:16px;letter-spacing:.06em}.race-facts span{font-size:var(--small-text);letter-spacing:.05em}
 .vehicle-choices img{height:40px}.vehicle-choices span{font-size:var(--control-text);line-height:18px;margin-top:2px;letter-spacing:.015em}.scene-choices span{font-size:var(--small-text);line-height:16px;letter-spacing:0;padding:5px 6px}.scene-choices small{font-size:var(--small-text)}
@@ -78,19 +78,19 @@
 .result-stats span{font-size:13px;letter-spacing:.06em}.result-panel li{font-size:15px;line-height:1.4}.result-stats strong{color:var(--ink)}
 #details h2{font-size:38px;line-height:1.1}.control-columns h3{font-size:var(--body-text)}.control-columns dl{font-size:15px;line-height:1.45;gap:8px 16px}.control-columns dt{font:700 15px/1.45 var(--font)}.control-columns dd{color:var(--muted)}#controlsContent .tip{font-size:var(--control-text);line-height:1.5}
 .setting{font-size:var(--body-text)}.setting select{font-size:var(--body-text);color:var(--ink);background:var(--action-surface);border-color:var(--line)}.setting input{accent-color:var(--accent)}.close{font-size:32px;background:var(--action-surface);color:var(--ink);border:1px solid var(--line);border-radius:4px}#creditsContent a{color:#9bedff}
-.race-status,.times,.route-map,.instrument,.pursuit-status{background:var(--hud-surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 3px 15px #0005}
+.race-status,.times,.route-map,.instrument,.pursuit-status{background:none;border:0;border-radius:0;box-shadow:none}
 .race-status{top:20px;left:24px;padding:12px 16px;gap:16px}.status-labels>span{font-size:var(--small-text);letter-spacing:.08em}.status-labels strong{font-size:var(--body-text)}.position small{color:var(--ink)}
 .times{top:20px;right:24px;padding:12px 16px;gap:6px}.times>.eyebrow{font-size:var(--small-text)}.times>span:not(.eyebrow){font-size:15px;color:var(--ink)}.times small{font-size:13px;color:var(--muted)}
 .route-map{left:24px;bottom:94px;padding:10px 10px 12px;gap:5px}.route-map>span{font-size:var(--small-text);letter-spacing:.06em;color:var(--ink)}
 .instrument{right:24px;bottom:94px;height:304px}.speed-readout>span{font-size:13px;letter-spacing:.08em;color:var(--ink)}.gear small{font-size:var(--small-text);color:var(--ink)}.resources{top:222px;left:18px;right:18px;gap:10px}.resources label>span{font-size:var(--small-text);line-height:16px;letter-spacing:.045em;color:var(--ink)}.resources kbd{color:var(--accent);font-weight:600}.resources progress{height:6px}.gauge-track{stroke:#728798}#ticks line{opacity:.9}
-.pursuit-status{top:20px;left:24px;background:var(--hud-surface)}.pursuit-heading .eyebrow{font-size:var(--small-text);letter-spacing:.04em}.pursuit-contact,.pursuit-status label>span{font-size:13px;letter-spacing:.025em;color:var(--ink)}.pursuit-contact b,.pursuit-status label b{font-weight:600}
-.race-message,.wrong-way{background:var(--hud-surface);border:1px solid var(--line);border-radius:6px;padding:8px 20px;text-align:center}.race-message:empty{display:none}.wrong-way{font-size:18px;letter-spacing:.08em}
-.drive-controls{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;padding:7px 12px;max-width:calc(100% - 32px);width:max-content;background:var(--hud-surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 3px 15px #0005;pointer-events:auto}
+.pursuit-status{top:20px;left:24px;background:none}.pursuit-heading .eyebrow{font-size:var(--small-text);letter-spacing:.04em}.pursuit-contact,.pursuit-status label>span{font-size:13px;letter-spacing:.025em;color:var(--ink)}.pursuit-contact b,.pursuit-status label b{font-weight:600}
+.race-message,.wrong-way{background:none;border:0;border-radius:0;padding:0;text-align:center}.race-message:empty{display:none}.wrong-way{font-size:18px;letter-spacing:.08em}
+.drive-controls{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;padding:0;max-width:calc(100% - 32px);width:max-content;background:none;border:0;border-radius:0;box-shadow:none;pointer-events:auto}
 .drive-controls .driving-views,.drive-controls .hud-help{position:static;inset:auto;transform:none;background:none;border:0;padding:0;margin:0;display:flex;align-items:center;gap:12px;color:var(--ink)}
 .drive-controls .driving-views>span{display:inline;font:700 var(--small-text) var(--font);letter-spacing:.06em;color:var(--ink)}.drive-controls .driving-views>button{min-width:126px;font:700 var(--control-text)/1.2 var(--font);padding:10px 12px}
-.drive-controls button{min-height:44px;border:1px solid var(--line);border-radius:4px;background:var(--action-surface);color:var(--ink)}.drive-controls button:hover{background:var(--action-hover);color:var(--ink);border-color:var(--accent)}
+.drive-controls button{min-height:44px;border:0;border-radius:0;background:none;color:var(--ink)}.drive-controls button:hover{background:var(--action-hover);color:var(--ink);border-color:var(--accent)}
 .drive-controls .hud-help{font:600 var(--control-text)/1.3 var(--font);letter-spacing:0;gap:16px}.hud-help>span,.hud-help button{display:flex;align-items:center;gap:8px;white-space:nowrap}.drive-controls .hud-help button{font:600 var(--control-text) var(--font);padding:7px 10px}.drive-controls .hud-help button span{font-size:var(--control-text);margin:0;color:var(--ink)}
-.hud-help kbd{display:inline-flex;align-items:center;justify-content:center;min-width:28px;min-height:28px;padding:3px 6px;background:var(--key-surface);border:1px solid var(--line);border-radius:3px;color:var(--accent);font:700 13px/1 var(--font);text-shadow:none}#angleControls{gap:6px}#angleControls button{width:44px;font-size:20px;border:1px solid var(--line)}
+.hud-help kbd{display:inline-flex;align-items:center;justify-content:center;min-width:28px;min-height:28px;padding:3px 6px;background:none;border:1px solid var(--line);border-radius:3px;color:var(--ink);font:700 13px/1 var(--font);text-shadow:none}#angleControls{gap:6px}#angleControls button{width:44px;font-size:20px;border:0}
 .performance-overlay{font-size:var(--small-text);line-height:1.3;background:var(--surface);color:var(--ink);border-color:var(--line)}.device-note{font-size:13px;color:var(--ink);background:var(--surface)}
 @media(min-width:1100px) and (min-height:600px){
  .menu{grid-template-rows:40px minmax(0,1fr)32px;padding-block:10px;row-gap:4px}.menu-content{gap:4px;padding-top:0}.menu h1{font-size:32px;line-height:32px;margin-bottom:0}.menu .route-tag{font-size:var(--small-text);line-height:16px}.menu .race-facts{min-height:24px;gap:16px}.menu .race-facts span{font-size:var(--small-text);letter-spacing:0}.menu .race-facts strong{font-size:20px}
@@ -116,4 +116,62 @@
  .instrument{width:172px;height:248px;bottom:180px}.gauge{width:172px;height:172px}.speed-readout{top:36px;left:18px;width:136px}.speed-readout>strong{font-size:48px}.gear b{font-size:22px}.gear{gap:6px;margin-top:7px}.resources{top:172px;left:10px;right:10px;gap:8px}.resources label>span{font-size:var(--small-text);letter-spacing:0}.resources label{gap:5px}.route-map{bottom:180px}.route-map canvas{width:144px;height:124px}
  .title-copy h1{font-size:76px}.race-status{padding:7px}.position{font-size:34px}.position small{font-size:18px}.status-labels{padding-left:7px}.status-labels strong{font-size:var(--control-text)}.times{max-width:46%;padding:7px}.times strong{font-size:21px}.times small{font-size:var(--small-text)}.pursuit-status{max-width:calc(100vw - 200px)}
  .modal{padding:12px}.panel{padding:22px;max-height:calc(100dvh - 24px)}.panel:has(.panel-art){padding-top:100px}.panel h2{font-size:38px}#details{padding:24px 18px;max-height:calc(100dvh - 24px)}#details h2{font-size:34px;padding-right:28px}.control-columns dl{font-size:var(--control-text)}.control-columns dt{font-size:var(--control-text)}
+}
+
+/* Scene composition: artwork and road lead; instruments sit in the perimeter. */
+:root{
+ --scene-shadow:0 1px 2px #000,0 3px 10px #02070ccc;
+ --edge-strong:#040b14d9;--edge-soft:#040b1480;--dial-wash:#06111b80;
+ --instrument-rule:#f6faff73;--key-line:#f6faff8c;--key-wash:#ffffff08;--prompt-hover:#ffffff14;
+ --title-strong:#061321eb;--title-soft:#061321ad;--title-tail:#06132147;
+ --hud-inset:28px;--title-width:340px;--gauge-size:230px;
+}
+.title-screen{padding:6vh 6vw}
+.title-art{object-position:67% 50%}
+.title-shade{background:linear-gradient(90deg,var(--title-strong),#061321cf 16%,var(--title-soft) 28%,var(--title-tail) 42%,transparent 58%),linear-gradient(180deg,#040b14bf,transparent 24%),linear-gradient(0deg,var(--edge-strong),transparent 30%)}
+.title-copy{width:var(--title-width);max-width:38vw;padding:0;background:none;border:0;text-shadow:var(--scene-shadow)}
+.title-copy .eyebrow{display:flex;align-items:center;gap:10px;font-size:var(--small-text);letter-spacing:.19em}
+.title-copy .eyebrow::before{content:'';width:28px;height:2px;background:var(--accent)}
+.title-copy h1{font-size:clamp(88px,8.5vw,118px);line-height:.82;letter-spacing:-.025em;margin:22px 0}
+.title-copy p{max-width:var(--title-width);font-size:17px;line-height:1.6;margin:22px 0;color:var(--ink)}
+.title-copy .primary{width:286px;max-width:100%;min-height:52px;padding:12px 20px;border-radius:0;background:linear-gradient(115deg,#ffdc7c,var(--accent));text-shadow:none;box-shadow:inset 0 1px #fff6}
+.title-copy .primary:hover{background:#ffe096;color:#08121e}.title-copy .primary:active{background:var(--accent-pressed)}
+.title-copy .start-hint{font-size:13px;letter-spacing:.07em;margin-top:14px;color:var(--ink)}
+.title-top,.title-bottom{font-size:var(--small-text);font-weight:600;letter-spacing:.09em;line-height:16px;color:var(--ink);text-shadow:var(--scene-shadow)}
+.title-top>span,.title-bottom>span{background:none;border:0;padding:0}
+#hud{isolation:isolate;text-shadow:var(--scene-shadow)}
+#hud::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 430px 250px at left top,var(--edge-soft),transparent),radial-gradient(ellipse 430px 250px at right top,var(--edge-soft),transparent),radial-gradient(ellipse 310px 270px at right bottom 150px,var(--edge-soft),transparent),radial-gradient(ellipse 260px 200px at left bottom 130px,var(--edge-soft),transparent),linear-gradient(180deg,var(--edge-strong),transparent 250px),linear-gradient(0deg,var(--edge-strong),transparent 220px)}
+.race-status{left:var(--hud-inset);top:var(--hud-inset);padding:0;gap:18px}.position{font-size:58px}.position small{font-size:20px}
+.status-labels{gap:8px;padding-left:14px}.status-labels>span{color:var(--accent)}.status-labels strong{font-size:var(--body-text);letter-spacing:.035em}
+.times{right:var(--hud-inset);top:var(--hud-inset);padding:0;gap:6px}.times strong{font-size:30px;line-height:1.15}.times small{color:var(--ink)}
+.route-map{left:var(--hud-inset);bottom:88px;padding:0;gap:8px}.route-map canvas{width:200px;height:173px;filter:drop-shadow(0 2px 3px #0008)}.route-map>span{font-weight:600;letter-spacing:.09em}
+.instrument{right:var(--hud-inset);bottom:86px;width:var(--gauge-size);height:276px;transform:none}
+.instrument::before{content:'';position:absolute;top:0;left:0;width:var(--gauge-size);height:var(--gauge-size);border-radius:50%;background:radial-gradient(ellipse closest-side,var(--dial-wash) 0%,var(--dial-wash) 42%,transparent 100%);pointer-events:none}
+.gauge{width:var(--gauge-size);height:var(--gauge-size);filter:drop-shadow(0 1px 2px #0008)}.gauge-track{stroke:var(--instrument-rule);stroke-width:5}.gauge-fill{stroke-width:5}#ticks line{stroke-width:1.5;opacity:.92}
+.speed-readout{top:54px;left:21px;width:188px}.speed-readout>strong{font-size:66px;letter-spacing:-.025em}.speed-readout>span{font-size:13px;letter-spacing:.14em}.gear{margin-top:12px;gap:9px}.gear b{font-size:27px}
+.resources{top:211px;left:14px;right:14px;gap:10px}.resources label{gap:5px}.resources label>span{font-size:var(--small-text);line-height:16px;letter-spacing:.055em}.resources progress{height:4px}
+.pursuit-status{left:var(--hud-inset);top:var(--hud-inset);padding:4px 0 4px 14px;width:276px;border-left:2px solid var(--cyan)}.pursuit-heading{gap:8px;flex-wrap:wrap}.pursuit-contact{margin:10px 0}.pursuit-status label{margin-top:9px}
+.race-message{font-size:112px;line-height:1;color:var(--accent);text-shadow:0 3px 2px #0008,0 5px 24px #02070cb3}.wrong-way{font-size:18px;font-weight:700;letter-spacing:.13em}
+.drive-controls{bottom:18px;gap:20px;padding:0;background:none;border:0;box-shadow:none}
+.drive-controls .driving-views{gap:12px}.drive-controls .driving-views>.view-label{display:flex;align-items:center;gap:8px;color:var(--ink);letter-spacing:.12em}.view-label svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1px 2px #000)}
+.drive-controls .driving-views>button{min-width:126px;padding:10px 12px;border-bottom:1px solid var(--instrument-rule);font:700 var(--control-text)/1.2 var(--font);text-shadow:var(--scene-shadow)}
+.drive-controls button{background:none;border-radius:0;transition:color var(--motion),background var(--motion)}.drive-controls button:hover{background:var(--prompt-hover);color:var(--accent);border-color:var(--accent)}.drive-controls button:active{background:#ffffff24;color:var(--accent)}
+.drive-controls .hud-help{gap:18px;padding-left:20px;border-left:1px solid var(--instrument-rule)}.drive-controls .hud-help button{padding:6px 8px;text-shadow:var(--scene-shadow)}
+.hud-help kbd{background:var(--key-wash);border-color:var(--key-line);border-radius:2px;color:var(--ink);font-size:13px;text-shadow:var(--scene-shadow)}#angleControls button{width:44px;border:0;border-bottom:1px solid var(--instrument-rule);font-size:22px}
+.performance-overlay{background:none;border:0;box-shadow:none;padding:4px 8px;text-shadow:var(--scene-shadow)}
+@media(max-height:740px){.title-copy{padding:0}.title-copy h1{font-size:104px;margin:18px 0}.title-copy p{font-size:var(--body-text);margin:18px 0}}
+@media(max-height:540px) and (min-width:801px){.title-copy h1{font-size:88px;margin:12px 0}.title-copy p{margin:14px 0}.title-copy .start-hint{margin-top:10px}}
+@media(max-width:800px){
+ :root{--hud-inset:12px;--gauge-size:210px}
+ .title-screen{align-items:flex-end;padding:24px 6vw 70px}.title-art{height:65%;object-position:65% 65%}.title-shade{background:linear-gradient(0deg,#061321 8%,var(--title-strong) 29%,#0613218c 46%,transparent 68%),linear-gradient(180deg,#040b14a6,transparent 18%)}.title-copy{width:340px;max-width:100%;padding:0}.title-copy h1{font-size:88px;margin:14px 0}.title-copy p{font-size:var(--body-text);margin:16px 0}.title-top{top:24px}.title-bottom{bottom:24px}
+ .race-status{padding:0;gap:10px}.position{font-size:44px}.status-labels{padding-left:10px;gap:7px}.times{padding:0}.times strong{font-size:24px}
+ .route-map{left:var(--hud-inset);bottom:164px;padding:0}.route-map canvas{width:170px;height:147px}.instrument{bottom:164px;height:266px}.speed-readout{top:46px;left:20px;width:170px}.speed-readout>strong{font-size:58px}.resources{top:193px;left:12px;right:12px}.gear{margin-top:10px}
+ .pursuit-status{padding:4px 0 4px 10px;max-width:calc(100vw - 200px)}.drive-controls{bottom:44px;width:calc(100% - 24px);max-width:none;gap:8px;padding:0}.drive-controls .hud-help{gap:12px;padding-left:14px}.performance-overlay{top:132px;bottom:auto;left:auto;right:var(--hud-inset);transform:none;max-width:calc(48vw - 12px);white-space:normal;text-align:right}
+}
+@media(max-width:460px){
+ :root{--gauge-size:172px}
+ .title-copy{width:300px}.title-copy h1{font-size:76px;margin:12px 0}.title-copy .eyebrow{font-size:var(--small-text)}.title-copy .start-hint{font-size:var(--small-text)}.title-copy .primary{width:266px}.title-copy p{margin:14px 0}.title-art{height:61%}.title-top,.title-bottom{font-size:11px;letter-spacing:.05em}
+ .drive-controls{display:grid;justify-items:center;gap:8px}.drive-controls .driving-views>.view-label{display:none}.drive-controls .hud-help{padding-left:0;border:0;gap:10px}.drive-controls .hud-help button{padding:6px}.drive-controls .hud-help,.drive-controls .hud-help button,.drive-controls .hud-help button span{font-size:13px}
+ .instrument{height:238px;bottom:160px}.speed-readout{top:36px;left:18px;width:136px}.speed-readout>strong{font-size:48px}.gear{gap:6px;margin-top:7px}.gear b{font-size:22px}.resources{top:167px;left:8px;right:8px;gap:8px}.resources label>span{letter-spacing:0}.route-map{bottom:160px}.route-map canvas{width:136px;height:118px}
+ .race-status{padding:0}.position{font-size:34px}.position small{font-size:18px}.status-labels{padding-left:7px}.status-labels strong{font-size:var(--control-text)}.times{padding:0;max-width:46%}.times strong{font-size:22px}.pursuit-status{max-width:calc(100vw - 190px)}.pursuit-heading strong{font-size:19px}.race-message{font-size:88px}
 }
