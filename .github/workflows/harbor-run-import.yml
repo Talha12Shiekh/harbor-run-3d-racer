@@ -39,7 +39,7 @@ jobs:
           mkdir parts
           ready=false
           for attempt in $(seq 1 120); do
-            if curl --fail --silent "$BUNDLE_PREFIX/part-000" -o parts/part-000; then
+            if curl --fail --silent "$BUNDLE_PREFIX/part-000" -o parts/part-000 && test "$(wc -c < parts/part-000)" -eq 16777216; then
               ready=true
               break
             fi
