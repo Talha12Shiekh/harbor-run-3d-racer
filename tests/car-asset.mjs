@@ -9,6 +9,7 @@ import {wheelSteering} from '../dist/handling.js';
 import {VEHICLES} from '../dist/catalog.js';
 import {DRIVING_VIEWS,SEATS,cameraPose} from '../dist/cameras.js';
 import {prepareCockpit} from '../dist/cockpit.js';
+import {ImpactEffects} from '../dist/impact-effects.js';
 globalThis.self=globalThis;
 // Geometry validation uses an image metadata stub. It does not test GPU texture upload.
 globalThis.createImageBitmap=async()=>({width:1024,height:1024,close(){}});
@@ -39,10 +40,34 @@ function makeWorld(){
   sun:new THREE.DirectionalLight(),look:new THREE.Vector3(),time:0,carMeshes:[],
   renderCalls:0,
  });
- world.renderer={render(){world.renderCalls++;}};
+ world.renderer={render(){world.renderCalls++;},getPixelRatio(){return 1;}};
+ world.impactEffects=new ImpactEffects(world.scene);
  world.attachCars();
  return world;
 }
+test('AC-43 AC-44 actual scene fills three bounded particle draws, freezes on pause and reuses resources',()=>{
+ const w=makeWorld(),e=w.impactEffects,root=e.root,p=w.race.player;
+ const event={id:1,kind:'impact',actors:[0,1],x:p.x,y:p.y+.58,z:p.z+2,ground:p.y+.04,nx:0,nz:-1,closing:30,sliding:0,vx:0,vz:18,severity:.9};w.impact([event]);w.race.phase='racing';w.race.elapsed+=1/60;w.update(1/60);
+ assert.ok(e.sparks.geometry.drawRange.count>0&&e.sparks.geometry.drawRange.count<=384);assert.ok(e.fragments.count>0&&e.fragments.count<=48);assert.ok(e.dust.geometry.drawRange.count>0&&e.dust.geometry.drawRange.count<=40);assert.ok(e.light.intensity>0);assert.equal(e.light.castShadow,false);
+ for(const values of [e.sparkPosition,e.sparkColor,e.fragments.instanceMatrix.array,e.dustPosition])assert.ok(values.every(Number.isFinite));
+ w.race.pause();const before=JSON.stringify(e.field);w.update(1/60);assert.equal(JSON.stringify(e.field),before);w.race.restart();w.attachCars();assert.equal(w.impactEffects,e);assert.equal(e.root,root);assert.equal(e.sparks.geometry.drawRange.count,0);assert.equal(e.fragments.count,0);assert.equal(e.light.intensity,0);
+ const resources=[e.sparks.geometry,e.sparks.material,e.fragments.geometry,e.fragments.material,e.dust.geometry,e.dust.material];let disposed=0;for(const r of resources)r.addEventListener('dispose',()=>disposed++);e.dispose();assert.equal(disposed,6);assert.equal(root.parent,null);
+});
+test('AC-44 impact camera offsets remain bounded across every view and rear hold, with reduced motion disabled',()=>{
+ const w=makeWorld(),p=w.race.player;w.race.phase='racing';
+ for(const view of DRIVING_VIEWS)for(const rear of [false,true]){
+  w.clearImpacts();w.setDrivingView(view.id);
+  const event={id:2,kind:'impact',actors:[0,1],x:p.x,y:p.y+.58,z:p.z,ground:p.y+.04,nx:1,nz:0,closing:40,sliding:0,vx:0,vz:20,severity:1};
+  w.impact([event]);w.race.elapsed+=.02;w.update(.02,rear);
+  const pose=cameraPose(p,view.id,w.trackingYaw,rear,false),distance=w.camera.position.distanceTo(new THREE.Vector3(...pose.eye));
+  assert.ok(distance<=(pose.inside?.03:.21));assert.ok(w.camera.fov<=pose.fov+2.01);
+  w.clearImpacts();w.followInitialized=false;w.impact([event],true);w.race.elapsed+=.02;w.update(.02,rear,false,true);
+  assert.equal(w.impactEffects.light.intensity,0);
+  const quietEye=new THREE.Vector3(...cameraPose(p,view.id,w.trackingYaw,rear,true).eye);
+  assert.ok(w.camera.position.distanceTo(quietEye)<1e-6);
+ }
+});
+
 const near=(actual,expected,message)=>assert.ok(Math.abs(actual-expected)<1e-6,message??`${actual} != ${expected}`);
 
 test('AC-30 all five actual cameras frame every body at every compass heading without changing the event',()=>{
@@ -143,7 +168,7 @@ test('AC-12 repeated restarts release unique resources and preserve shared car a
    w.race.restart('#dfd8c6');w.attachCars();w.update(1/60);
    for(const resource of owned)assert.equal(counts.get(resource),1,'An old car resource must be released exactly once');
    assert.equal(sharedDisposals,0,'Restart must preserve shared geometry, materials and textures');
-   assert.equal(w.carMeshes.length,8);assert.equal(w.contactShadows.length,8);assert.equal(w.scene.children.length,16);
+   assert.equal(w.carMeshes.length,8);assert.equal(w.contactShadows.length,8);assert.equal(w.scene.children.length,17);assert.equal(w.scene.children.filter(o=>o===w.impactEffects.root).length,1);
    for(const old of [...oldCars,...oldShadows])assert.equal(old.parent,null);
    for(const m of w.carMeshes[0].userData.paints)assert.equal(m.color.getHexString(),'dfd8c6');
   }

@@ -1,6 +1,6 @@
 # Harbor Run
 
-Current direction: the user authorized the 1.7.2 title and HUD composition revision in docs/specs/0001-city-racer/index.md. Earlier city/sedan choices remain historical rationale.
+Current direction: the user authorized the 1.8.0 collision feedback update in docs/specs/0001-city-racer/index.md. The accepted 1.7.2 title and HUD composition remains. Earlier city/sedan choices remain historical rationale.
 
 ## Character
 
@@ -57,3 +57,7 @@ The title places the wordmark, concise copy and amber primary action directly in
 Keep the accepted car art and driving scene dominant. Remove large rectangular backings from the title and racing instruments, without restoring tiny text. Retain the brand, real event values, readable control names, 44 pixel button targets and cyan keyboard focus. Hover and pressed states must be visible on the refined controls. Use smooth gradients and text shadows, not a new collection of panels. The title and driving HUD are the focused surfaces for this revision.
 
 Token values are authoritative in dist/style.css. The color calculation compares the actual foregrounds and surfaces, including translucent HUD backing over white. It cannot prove rendered geometry or appearance. The last cloud browser attempt reported its graphics renderer as Disabled.
+
+## Contact effects
+
+Keep the open driving view and current HUD composition. Contact feedback belongs in the actual world: warm directional spark streaks, small spinning fragments and a brief soft dust burst at the bumper or scrape point. A short shared light can illuminate nearby surfaces. Strength comes from real closing speed, with lighter sparks and a continuous gritty sound for sliding. Body movement and camera recoil are brief and bounded, with a much smaller cabin movement. Reduced motion disables camera shake and the contact flash. Reduced graphics lowers particle emission. Player contacts take priority when several effects compete for fixed pools. Full screen flashes, crash captions and cutaway camera sequences are not part of this update.

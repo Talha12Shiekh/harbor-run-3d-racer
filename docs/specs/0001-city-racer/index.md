@@ -1,6 +1,6 @@
 # 0001 City racer
 
-**Status**: Implemented, 1.7.2 title and HUD composition; browser checks remain open in BUILD-REPORT.md
+**Status**: Implemented, 1.8.0 collision feedback; browser and audible checks remain open in BUILD-REPORT.md
 **Date**: 2026-10-11
 **Authorized by**: User, Accept and build, then proceed with all remaining steps.
 
@@ -306,3 +306,48 @@ Your two screenshots from 2026-10-12 are the direct problem evidence. The offici
 
 ### Verification limits
 The current cloud browser reported GL_VENDOR and GL_RENDERER as Disabled during the preceding check, so it could not initialize WebGL. Numerical contrast and DOM fixture tests do not prove rendered layout, GPU appearance, physical controller response or audible quality. These browser checks remain open.
+
+## Collision feedback, authorized 2026-10-12
+
+### Summary and requirements
+Car contacts need a clear sense of weight. Emit effects from the actual contact point, with short sparks, small fragments, dust, body recoil and distinct collision sounds. Small bumps, sustained scrapes and hard impacts have different strength and timing.
+
+AC-41: Car contacts follow an oriented capsule (a rounded vehicle footprint), 4.56 metres long and 1.96 metres wide, against the established 4.6 metre models. Return the contact point, normal, incoming closing speed, sliding speed and average motion before exchanging momentum. Preserve mass weighting, speed limits, legal progress and parallel contact without repeated speed penalties.
+AC-42: Publish bounded impact and scrape events during active racing, including traffic, rivals, police and road edge contacts. A stationary overlap emits no effect. A sustained contact emits one initial impact, with a new hard hit only after separation or a substantially stronger blow. Rate limit sliding events and drain events once per displayed frame. Pause, recovery, garage and restart cannot replay stale impacts.
+AC-43: Hard contacts produce a localized burst of warm streak sparks, spinning fragments, soft dust and a brief light on nearby surfaces. Sliding produces smaller directional sparks. Particles inherit contact motion, fall under gravity, bounce once against the local road height and expire. Use fixed pools, at most three particle draws and one shared light. Reduced graphics lowers emission; reduced motion disables camera shake and the impact flash.
+AC-44: Impacts briefly rock the body and recoil the current camera, with bounded movement in all five views and rear view. Cockpit movement is smaller. Effects do not steer the player, change checkpoint progress or slow the event clock. Pause freezes visible particle and recoil progression.
+AC-45: Replace the generic impact contribution to background noise with original layered collision audio: low body thump, short crunch, damped metallic ring and a fragment tail for harder hits. Sliding has a continuous gritty scrape that fades when contact ends. Volume and stereo position derive from actual strength, contact distance and the current camera. Respect the existing volume setting and browser audio activation; cap simultaneous impact voices and disconnect ended nodes. Mute and clear transient sound on pause, exit and restart.
+AC-46: Verify contact geometry, momentum, finite state, contact deduplication, particle limits, expiry, reduced motion, sound envelopes, lifecycle and actual app wiring. Run existing race, pursuit, menu, camera and asset checks. Publish the same Site, synchronize the same GitHub repository with its history intact, and replace the same complete source ZIP. Report unavailable GPU and audible checks explicitly.
+
+### Decision and value sources
+Extend the existing simulation, Three.js scene and Web Audio engine in place. A new engine would disrupt working driving and authored assets. A separate effect layer is useful, but its events must come from real contacts rather than a decaying impact flag. The rounded footprint corrects late bumper detection from the old small circle. This remains arcade physics, with visual recoil rather than full body deformation or rollover simulation. Use the existing end to end build approach.
+
+The collision constants live in dist/collisions.js. Capsule radius is .98 metres, centre segment half length is 1.30 metres, and contact tolerance is .025 metres. Momentum exchange retains restitution .15. Effects require normal closing speed at least 1.2 m/s. A contact rearms after .12 seconds without contact; during sustained contact a new impact requires at least 8 m/s, 1.4 times the previous hit and a .28 second interval. Sliding requires 2.5 m/s and an .08 second interval. Severity is bounded from closing speed as 1 minus exp of negative closing speed divided by 14. The event queue holds at most 48 entries and drops the oldest on overflow. With a slow player (under 5 m/s) and route gap under 30 metres, police final approach targets player speed plus .35 times the gap minus 5 metres, bounded to 0 through 6 m/s. This accommodates the earlier bumper contact and preserves the ability to bust a stopped player without repeatedly accelerating them.
+
+Visual pools contain 192 sparks, 48 fragments and 40 dust particles. Light lasts at most .09 seconds and has no shadow map. It follows a player hit or another hit within 20 metres, favoring the strongest recent contact. Spark life is .18 to .55 seconds, fragments .45 to 1.05 seconds, dust .35 to .85 seconds. Gravity is 12 m/s squared. Full quality emits 12 to 72 sparks and 2 to 12 fragments per impact; reduced graphics emits half as many and less dust. Scrapes emit 6 to 14 sparks with no fragment burst. Body roll is capped at .07 radians and pitch at .045 radians. Camera translation is capped at .18 metres outside and .025 metres inside, with small rotation and at most two degrees of transient field of view. Decay follows active simulation elapsed, including Speedbreaker, rather than wall time. Player events are dispatched last so they take priority in fixed particle and sound budgets.
+
+Original audio waveforms come from dist/impact-audio.js and are generated into cached buffers at the actual AudioContext sample rate. A deterministic noise source supplies the crunch and scrape; decaying low and metallic partials supply body and panel resonance. Heavy hits add delayed small fragment transients. They are original effect sounds, with no commercial game recordings. Impact gain follows severity and attenuation within 65 metres, while player contact receives full gain. Stereo pan uses the contact displacement along the current camera right vector. Impact sources use a small playback pitch variation, at most ten voices, and a master compressor when supported. One reused scrape loop follows the strongest recent contact and fades after .14 seconds without a sliding event.
+
+| Action | Produced value | Source |
+| --- | --- | --- |
+| Detect car contact | Point, normal, penetration | Closest capsule segments from car position, heading and the footprint constants |
+| Exchange momentum | Speeds and impact strength | Precontact heading, slip, speed, masses and normal closing speed |
+| Detect road contact | Point, inward normal, sliding and closing speed | Projected route, side, road width and precontact car velocity |
+| Emit feedback | Kind, strength, actors, position, motion | Actual contact, current simulation time, per contact cooldown and thresholds |
+| Animate particles | Position, velocity, brightness, age and fragment orientation | Contact event, bounded seeded variation, gravity, local road height and active simulation delta |
+| Move body and camera | Short decaying offsets | Player/other actor contact normal, severity, selected view and reduced motion |
+| Play impact audio | Waveform, gain, rate and pan | Original synthesis parameters, event severity, listener geometry, volume and voice cap |
+| Sustain scraping | Loop level, pan and fade | Strongest recent sliding event, actual AudioContext time and contact expiry |
+| Clear feedback | Empty queue, pools, recoil and voices | Actual restart, recovery, exit, pause and inactive state transitions |
+
+No settings migration, backend, external asset service or new dependency is needed. Particle resources are shared across restarts. Effects are decorative and cannot award progress, end pursuits or take control of the camera selection.
+
+### Build plan
+- [x] AC-41, AC-42, AC-45: Wire contact events through a real collision to original impact audio, preserving the existing driving rules.
+- [x] AC-43, AC-44: Integrate shared particles, impact light and bounded body/camera recoil across all views and quality settings.
+- [x] AC-41, AC-42, AC-43, AC-44, AC-45, AC-46: Validate contact and effect behavior, run gameplay regressions and prepare the checked release for publication/source synchronization. Native results confirm delivery separately.
+
+### Consequences and references
+Contacts become more visible and audible, and the footprint detects bumpers earlier. The new footprint can change how AI cars pass, so full race and pursuit regressions are required. Short fragments are decorative, with no gameplay collision or permanent broken panels. This does not simulate chassis deformation, crashes with rolling vehicles or wrecked car states. A fixed particle budget bounds work but does not establish browser FPS.
+
+Internet reference research found a Hot Pursuit crash montage and publisher trailer media. Two retrieved crash images were directly inspected: a low road scrape with elongated warm sparks and small fragments, and a police contact with dust. The publisher's 33.2 second trailer was decoded and inspected at 17 broad samples and 12 closer samples across 25 to 29 seconds. The montage's YouTube playback could not be fetched; no claim of watching that video or hearing its sound is made. References inform original effects only, no reference pixels or recordings ship. Publisher page: https://store.steampowered.com/app/1328660/Need_for_Speed_Hot_Pursuit_Remastered/ . Image sources: https://wall.alphacoders.com/big.php?i=642571 and https://www.rapidreviewsuk.com/need-for-speed-hot-pursuit-remastered-review/ .

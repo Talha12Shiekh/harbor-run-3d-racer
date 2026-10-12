@@ -1,6 +1,7 @@
 import {hasVehicle,hasSetting,VEHICLES} from './catalog.js';
 import {getHandling,wheelSteering} from './handling.js';
 import {hasDrivingView,wrapYaw} from './cameras.js';
+import {carContact,ContactFeedback} from './collisions.js';
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const wrap=(v,n)=>((v%n)+n)%n;
 export const angleDiff=(a,b)=>wrap(a-b+Math.PI,Math.PI*2)-Math.PI;
@@ -36,14 +37,15 @@ export function integrate(car,input,dt,track){
  const targetSlip=input.handbrake&&car.speed>10?-car.steer*h.drift:car.speed>18&&input.throttle>.7?-car.steer*h.powerSlip*(car.speed/h.topSpeed)**2:0;car.slip+=(targetSlip-car.slip)*Math.min(1,dt*(input.handbrake?4:breaker?12:h.grip));
  car.x+=Math.sin(car.heading+car.slip)*car.speed*dt;car.z+=Math.cos(car.heading+car.slip)*car.speed*dt;car.wheel+=car.speed*dt/.34;
  const p=track.project(car.x,car.z,car.index);car.s=p.s;car.index=p.index;car.offset=p.offset;car.y=track.at(p.s).y;
- const edge=track.width/2-1.12;if(Math.abs(p.offset)>edge){const a=track.at(p.s),o=clamp(p.offset,-edge,edge);car.x=p.x+a.tz*o;car.z=p.z-a.tx*o;car.offset=o;car.speed*=Math.max(.2,1-dt*3);car.heading+=angleDiff(a.heading,car.heading)*Math.min(1,dt*2);car.impact=1;}
  car.impact=Math.max(0,car.impact-dt*3);
+ let contact=null;const edge=track.width/2-1.12;if(Math.abs(p.offset)>edge){const a=track.at(p.s),o=clamp(p.offset,-edge,edge),side=Math.sign(p.offset),vx=Math.sin(car.heading+car.slip)*car.speed,vz=Math.cos(car.heading+car.slip)*car.speed,nx=-side*a.tz,nz=side*a.tx;contact={x:p.x+a.tz*side*(track.width/2-.12),y:car.y+.58,z:p.z-a.tx*side*(track.width/2-.12),ground:car.y+.04,nx,nz,closing:Math.max(0,-(vx*nx+vz*nz)),sliding:Math.abs(vx*a.tx+vz*a.tz),vx,vz,side};car.x=p.x+a.tz*o;car.z=p.z-a.tx*o;car.offset=o;car.speed*=Math.max(.2,1-dt*3);car.heading+=angleDiff(a.heading,car.heading)*Math.min(1,dt*2);car.impact=Math.max(car.impact,1-Math.exp(-contact.closing/14));}
+ return contact;
 }
 export function collideCars(a,b){
- const dx=a.x-b.x,dz=a.z-b.z,d=Math.hypot(dx,dz),r=2.35;if(d>=r)return;
- const nx=d>1e-6?dx/d:1,nz=d>1e-6?dz/d:0,p=r-d,ha=getHandling(a.vehicle),hb=getHandling(b.vehicle),ma=ha.mass,mb=hb.mass;a.x+=nx*p*mb/(ma+mb);a.z+=nz*p*mb/(ma+mb);b.x-=nx*p*ma/(ma+mb);b.z-=nz*p*ma/(ma+mb);
- const an=Math.sin(a.heading+a.slip)*nx+Math.cos(a.heading+a.slip)*nz,bn=Math.sin(b.heading+b.slip)*nx+Math.cos(b.heading+b.slip)*nz,closing=a.speed*an-b.speed*bn;
- if(closing<0){const impulse=-closing*1.15;a.speed=clamp(a.speed+impulse*mb/(ma+mb)*an,-10,ha.boostSpeed);b.speed=clamp(b.speed-impulse*ma/(ma+mb)*bn,-10,hb.boostSpeed);a.impact=b.impact=clamp(-closing/8,.1,1);}
+ if(a.active===false||b.active===false)return null;const contact=carContact(a,b);if(!contact)return null;
+ const {nx,nz,penetration:p,an,bn}=contact,ha=getHandling(a.vehicle),hb=getHandling(b.vehicle),ma=ha.mass,mb=hb.mass;a.x+=nx*p*mb/(ma+mb);a.z+=nz*p*mb/(ma+mb);b.x-=nx*p*ma/(ma+mb);b.z-=nz*p*ma/(ma+mb);contact.x+=nx*p*(mb-ma)/(ma+mb)*.5;contact.z+=nz*p*(mb-ma)/(ma+mb)*.5;
+ if(contact.closing>0){const impulse=contact.closing*1.15;a.speed=clamp(a.speed+impulse*mb/(ma+mb)*an,-10,ha.boostSpeed);b.speed=clamp(b.speed-impulse*ma/(ma+mb)*bn,-10,hb.boostSpeed);a.impact=b.impact=clamp(1-Math.exp(-contact.closing/14),0,1);}
+ return contact;
 }
 export function progressCar(car,oldS,elapsed,track){
  if(car.traffic||car.police||car.finish!==null)return;const delta=wrap(car.s-oldS+track.length/2,track.length)-track.length/2;
@@ -63,26 +65,28 @@ export const PURSUIT=Object.freeze({reinforcements:Object.freeze([0,20,45]),esca
 export function policeInput(car,player,track,heat=1){
  const h=getHandling(car.vehicle),gap=wrap(player.s-car.s+track.length/2,track.length)-track.length/2,near=track.at(car.s+12+Math.max(0,car.speed)*.46),far=track.at(car.s+60),now=track.at(car.s);
  const lane=clamp(player.offset+(car.unit%2?1.2:-1.2),-6.6,6.6),angle=angleDiff(Math.atan2(near.x+near.tz*lane-car.x,near.z-near.tx*lane-car.z),car.heading),bend=Math.abs(angleDiff(far.heading,now.heading));
- const closing=player.speed<5&&Math.abs(gap)<30?clamp(Math.max(0,player.speed)+gap*.4-1.5,0,12):clamp(player.speed+(gap>15?8:gap< -8?-8:4),24,h.topSpeed);
+ const closing=player.speed<5&&Math.abs(gap)<30?clamp(Math.max(0,player.speed)+(gap-5)*.35,0,6):clamp(player.speed+(gap>15?8:gap< -8?-8:4),24,h.topSpeed);
  const pace=h.topSpeed*[.76,.85,.93][clamp(heat-1,0,2)],desired=Math.min(closing,clamp(pace-bend*75,18,pace));
  return {steer:clamp(angle*3,-1,1),throttle:car.speed<desired?1:.12,brake:car.speed>desired+2?.65:0,handbrake:false,boost:heat>=3&&gap>70&&bend<.09&&car.speed>30&&car.nitrous>.3,breaker:false};
 }
 export class Race{
  constructor(track){this.track=track;this.restart();this.phase='menu';}
  restart(color=PAINTS[0],vehicle=this.vehicle??'hypercar',mode=this.mode??'circuit'){
+  this.feedback=new ContactFeedback();
   const t=this.track;this.vehicle=hasVehicle(vehicle)?vehicle:'hypercar';this.mode=mode==='pursuit'?'pursuit':'circuit';this.player=createCar(t,'YOU',2,-2.4,color,false,this.vehicle);
   this.rivals=this.mode==='circuit'?['SABLE','RIFT','ONYX'].map((name,i)=>createCar(t,name,9+i*7,i%2?-2.4:2.6,['#ddd7cc','#245f78','#28272b'][i],false,VEHICLES[i+1].id)):[];
   this.traffic=Array.from({length:4},(_,i)=>{const c=createCar(t,'TRAFFIC '+i,180+i*t.length/4,i%2?-4.5:4.5,['#56665a','#a89a80','#e0dcce','#344b64'][i],true,VEHICLES[(i+4)%VEHICLES.length].id);c.speed=22;return c;});
   this.police=this.mode==='pursuit'?Array.from({length:3},(_,i)=>{const c=createCar(t,'PATROL '+(i+1),this.player.s-35-i*25,i%2?2.4:-2.4,'#101820',false,'interceptor');c.police=true;c.unit=i;c.active=i===0;return c;}):[];
   this.cars=[this.player,...this.rivals,...this.traffic,...this.police];this.phase='countdown';this.countdown=3;this.elapsed=0;this.beforePause=null;this.outcome=null;this.pursuit={heat:1,peakHeat:1,nearestDistance:this.police.length?Math.hypot(this.police[0].x-this.player.x,this.police[0].z-this.player.z):Infinity,escape:0,bust:0};
  }
- resetPlayer(){resetCar(this.player,this.track,this.mode==='pursuit');this.pursuit.escape=0;}
- pause(){if(this.phase==='paused'){this.phase=this.beforePause;return;}if(['racing','countdown'].includes(this.phase)){this.beforePause=this.phase;this.phase='paused';}}
+ resetPlayer(){resetCar(this.player,this.track,this.mode==='pursuit');this.pursuit.escape=0;this.feedback.clear();}
+ drainImpacts(){return this.feedback.drain();}
+ pause(){if(this.phase==='paused'){this.phase=this.beforePause;return;}if(['racing','countdown'].includes(this.phase)){this.beforePause=this.phase;this.phase='paused';this.feedback.drain();}}
  step(input,dt=STEP){if(!['countdown','racing'].includes(this.phase))return;if(this.phase==='countdown'){this.countdown-=dt;if(this.countdown<=0)this.phase='racing';return;}
  const slow=input.breaker&&this.player.breaker>.005&&this.player.speed>2;const simdt=dt*(slow?.4:1);this.elapsed+=simdt;
  if(this.mode==='pursuit')this.activatePolice();
- for(const c of this.cars){if(!c.active)continue;const old=c.s,control=c===this.player?input:c.police?policeInput(c,this.player,this.track,this.pursuit.heat):aiInput(c,this.track,this.cars);integrate(c,control,simdt,this.track);if(this.mode==='circuit')progressCar(c,old,this.elapsed,this.track);if(c!==this.player&&!c.police){c.stuck=c.speed<2?c.stuck+simdt:0;if(c.stuck>4)resetCar(c,this.track);}}
- for(let i=0;i<this.cars.length;i++)for(let j=i+1;j<this.cars.length;j++)if(this.cars[i].active&&this.cars[j].active)collideCars(this.cars[i],this.cars[j]);
+ for(let i=0;i<this.cars.length;i++){const c=this.cars[i];if(!c.active)continue;const old=c.s,control=c===this.player?input:c.police?policeInput(c,this.player,this.track,this.pursuit.heat):aiInput(c,this.track,this.cars),contact=integrate(c,control,simdt,this.track);if(contact)this.feedback.record('wall:'+i+':'+contact.side,contact,[i],this.elapsed);if(this.mode==='circuit')progressCar(c,old,this.elapsed,this.track);if(c!==this.player&&!c.police){c.stuck=c.speed<2?c.stuck+simdt:0;if(c.stuck>4)resetCar(c,this.track);}}
+ for(let i=0;i<this.cars.length;i++)for(let j=i+1;j<this.cars.length;j++)if(this.cars[i].active&&this.cars[j].active)this.feedback.record(i+':'+j,collideCars(this.cars[i],this.cars[j]),[i,j],this.elapsed);
  if(this.mode==='pursuit')this.updatePursuit(simdt);else if(this.player.finish!==null)this.phase='finished';
  }
  activatePolice(){

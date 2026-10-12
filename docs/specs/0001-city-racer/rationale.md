@@ -73,3 +73,15 @@ Reference links checked during this task:
 * [EA Unbound car list](https://www.ea.com/en/games/need-for-speed/need-for-speed-unbound/news/car-list), multiple body families including rally sedans and muscle cars. The older Hot Pursuit car list URL returned 404, so it was not used as verified roster evidence.
 
 The photographed cars, commercial menus and gameplay frames are reference evidence only. They are not bundled as shipped menu artwork. Barlow and Barlow Condensed are distributed with their actual OFL license texts. The authoring renderer has a broad area fill to approximate the runtime hemisphere fill; it remains a Blender preview, not browser proof.
+
+## Collision reference and decision, 2026-10-12
+
+The old collider was a small circle around each vehicle centre. It detected bumper contact well inside the 4.6 metre mesh. The impact flag then added only .015 to the generic noise gain, without a hit transient, particle event or recoil. Increasing that gain alone would retain the contact position and feedback problems.
+
+Fixing the existing system in place keeps the accepted controls, authored assets and race/pursuit rules. Adding an event layer alongside it gives sound and particles a real point, normal and severity, but requires explicit queue draining and lifecycle cleanup. Replacing the physics engine directly would permit fuller rigid body and deformation simulation, at the cost of coordinate, collision, vehicle handling and camera migration. The focused rounded footprint and original effect layer are the chosen scope. Contact feedback uses fixed pools, severity thresholds and cooldowns so stationary contact is silent and sustained scrapes do not turn into repeated crash bursts.
+
+Two retrieved images were directly inspected for long warm spark streaks, small fragments and dust. The publisher Steam page supplied a 640 by 360 video variant of its 33.2 second trailer. All 13 initialization/media segments were downloaded and decoded locally. Seventeen two second samples and twelve closer samples across 25 to 29 seconds were inspected. The sequence shows contact, a bright initial burst, dispersed fragments, dust and continuing motion. It also includes rollover/cutaway presentation beyond this update's arcade scope. This is sampled visual inspection, not a claim of checking every frame or listening to its sound. The separately found YouTube montage was unavailable to retrieval.
+
+Original waveform synthesis combines a short low body impulse, broadband crunch, decaying panel frequencies and a scattered high fragment tail. Looping gritty noise gives sustained scraping a distinct sound. No commercial recordings or imagery are included. The actual browser audio balance and GPU effect appearance remain unverified in this environment.
+
+References retrieved during research: https://store.steampowered.com/app/1328660/Need_for_Speed_Hot_Pursuit_Remastered/ , https://wall.alphacoders.com/big.php?i=642571 , https://www.rapidreviewsuk.com/need-for-speed-hot-pursuit-remastered-review/ .

@@ -1,6 +1,6 @@
-# Harbor Run 1.7.2
+# Harbor Run 1.8.0
 
-An original 3D arcade racer with five Blender authored vehicles, daylight forest/alpine scenery and a night forest setting inspired by the supplied Hot Pursuit footage. Circuit racing and police pursuits, four traffic cars, distinct handling, five driving cameras, an animated Blender cabin, nitrous, Speedbreaker, keyboard and standard gamepad controls. All current vehicle and scenery geometry is authored for this project; the earlier downloaded sedan and city assets have been retired.
+An original 3D arcade racer with five Blender authored vehicles, daylight forest/alpine scenery and a night forest setting inspired by the supplied Hot Pursuit footage. Circuit racing and police pursuits, four traffic cars, distinct handling, five driving cameras, an animated Blender cabin, contact sparks/debris/dust, impact recoil and layered collision audio, nitrous, Speedbreaker, keyboard and standard gamepad controls. All current vehicle and scenery geometry is authored for this project; the earlier downloaded sedan and city assets have been retired.
 
 ## Play
 
@@ -26,6 +26,8 @@ During either event, V, gamepad LB or the VIEW button cycles Chase, Wide chase, 
 Car, event, scenery, paint, driving view, tracking angle, briefing completion, graphics, sound, stats display and valid records persist in browser localStorage when available.
 
 The title places its wordmark and primary action directly beside the car artwork with a smooth scene fade. Race instruments sit around the perimeter, with a smaller speed arc, a brighter map route and thin resource meters. Camera, reset, rear view and pause use a lightweight prompt row and outlined key badges. Larger labels and readable dialogs remain. Existing keyboard/gamepad actions and saved profiles are retained.
+
+Car contact follows a rounded, oriented body footprint. A hard hit emits sparks, small spinning fragments, dust and a brief local light at the contact point, with a short body and camera recoil. Light bumps are smaller; sliding car and roadside contact produces sparks and a gritty scrape. Original synthesized collision sounds combine body thump, crunch, metal resonance and fragment transients. They follow impact strength, distance, camera stereo position and the existing sound volume. Particle pools and audio voices are capped and reused. Pause freezes visual effects and mutes transient audio; reset and restart clear them. Reduced graphics lowers emissions; reduced motion disables impact camera movement and flash. The cars do not gain permanent damage or rollover states.
 
 ## Controls and rules
 
@@ -116,6 +118,9 @@ Add `-- --render` to the vehicle command for six views per car. The saved circui
 | dist/world.js | Vehicle preparation, road, materials, camera and rendering |
 | dist/wilderness.js | Original kit loading, clear placements and theme lifecycle |
 | dist/app.js | Input, selectors, menus, HUD, records and fixed steps |
+| dist/collisions.js | Vehicle contact geometry and bounded impact/scrape events |
+| dist/impacts.js / dist/impact-effects.js | Shared particle simulation, scene draws and body/camera recoil |
+| dist/impact-audio.js / dist/audio.js | Original collision waveforms, sound distance/pan and transient lifecycle |
 | assets-src | Editable Blender scenes, original authoring scripts and previews |
 | tests | Driving, exported geometry and scene integration checks |
 | BUILD-REPORT.md | Actual checks, measured bounds and remaining verification limits |

@@ -1,6 +1,27 @@
-# Harbor Run 1.7.2 verification report
+# Harbor Run 1.8.0 verification report
 
 Date: 2026-10-12.
+
+## Collision feedback, 1.8.0
+
+The previous small circular car collider detected bumper contacts after substantial visual overlap. Its decaying impact flag only added a little background noise. Contacts now use a 4.56 by 1.96 metre oriented rounded footprint, with the actual point, normal, closing speed and sliding speed sent through a capped, drained event queue. Momentum remains mass weighted with restitution .15. Parallel contact does not repeatedly reduce speed, and stationary overlap is silent.
+
+Short warm spark streaks, small spinning fragments and soft dust spawn at that point and inherit contact motion. Fixed pools hold 192 sparks, 48 fragments and 40 dust particles. Three shared draw objects and one short, shadowless local light survive restarts. Particles fall, bounce and expire. Player body/camera recoil is bounded; cockpit movement is smaller. Reduced graphics halves emission, and reduced motion suppresses camera movement and flash. Simulation elapsed governs visible effect progression, so pause freezes it and Speedbreaker retains its timing.
+
+Original cached sound buffers combine body thump, crunch, damped metallic partials and delayed small fragment transients. A continuous scrape loop responds to recent sliding contact and fades without it. Stereo position uses the actual camera right vector, while volume follows strength, distance and the saved sound level. At most ten impact voices coexist; ended or stopped voices disconnect. Pause, recovery, garage and restart clear transient audio. No commercial sound or reference imagery is shipped.
+
+The first pursuit regression showed the new earlier contact could let a patrol accelerate a stopped player above the bust threshold. Its final approach now slows over the last few metres, preserving the existing stopped bust and driving escape behaviors. The older circle separation and scene object count assertions were updated for the new footprint and one reusable effect group, retaining penetration and ownership checks.
+
+### Verification for 1.8.0
+
+* `npm test`: 55 behavioral tests pass, including 11 contact/particle/audio checks and a new actual frame dispatch/recovery check. All five cars still complete Circuit and escape Pursuit; a stopped player is physically caught and busted.
+* `npm run check:model`: 20 actual scene/geometry tests pass, including new particle buffer, pause, ownership and camera recoil checks across all five views and rear hold. Only the GPU render call is replaced; this is scene integration evidence, not rendered screenshots.
+* `npm run check:world`: all 14 scenery exports and five real theme switches pass, with the driving corridor clear and ownership preserved.
+* `npm run check`: 20 JavaScript modules parse; local imports, assets, UI bindings and hosting configuration resolve. `git diff --check` is clean.
+* Original sound buffers at 22050, 44100 and 48000 Hz are deterministic, finite, bounded and fade at their ends. Stereo, volume, voice eviction, natural end cleanup and scrape expiry are checked with an AudioContext fixture. This does not prove audible sound quality.
+* Internet research directly inspected two collision images, 17 samples across a decoded 33.2 second publisher trailer, and 12 closer samples from its 25 to 29 second crash sequence. This establishes reference timing/composition only. The YouTube montage could not be retrieved; no claim of hearing its audio is made.
+
+GPU shader compilation, rendered particle appearance, audible impact balance, physical controllers and actual FPS remain browser/hardware checks. The supported browser preview is unavailable here and the previous cloud browser reported WebGL Disabled. Existing exterior/scenery assets and all 23 editable Blender scenes remain unchanged. These are arcade contact effects, without full chassis deformation or rolling wreck physics.
 
 ## Title and HUD composition, 1.7.2
 
